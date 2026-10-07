@@ -1,0 +1,21 @@
+# 数据和模型文件
+# Large and generated artifacts
+/data/
+/experiments/
+/project/
+/.mamba/
+/.tools/
+/.ruff_cache/
+/build/
+/dist/
+*.egg-info/
+/.pytest_tmp/
+/.pytest_tmp_*/
+/.pytest_cache/
+/.tmp/
+/.uv-cache/
+__pycache__/
+*.py[cod]
+
+# Local environments
+/.venv/

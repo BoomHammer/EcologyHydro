@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecologyhydro"
+version = "0.1.0"
+description = "Reproducible annual water yield experiments for the Yellow River basin"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "natcap.invest==3.20.2",
+    "GDAL>=3.10,<3.11",
+    "numpy>=1.26,<3",
+    "pandas>=2,<4",
+    "pygeoprocessing>=2.4.10,<3",
+    "taskgraph>=0.11,<1",
+    "PyYAML>=6,<7",
+    "pydantic>=2,<3",
+    "psutil>=5.6.6,<8",
+]
+
+[project.scripts]
+ecologyhydro = "ecologyhydro.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".mamba", ".tools", ".tmp", ".uv-cache", "data", "project", "experiments"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts/test"]
+addopts = "-ra"
