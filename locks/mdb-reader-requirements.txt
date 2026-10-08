@@ -1,0 +1,4 @@
+# Isolated optional M1 inspection tool; install into .tools/mdb-reader.
+access-parser==0.0.6
+construct==2.10.70
+tabulate==0.10.0

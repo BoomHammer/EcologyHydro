@@ -9,6 +9,7 @@ dependencies:
   - numpy>=1.26,<3
   - pandas>=2,<4
   - scipy
+  - netcdf4>=1.7,<2
   - pygeoprocessing>=2.4.10,<3
   - taskgraph>=0.11,<1
   - pyyaml>=6,<7
