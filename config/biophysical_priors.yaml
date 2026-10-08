@@ -1,0 +1,70 @@
+# Explicit engineering trial priors, NOT literature-calibrated local parameters.
+# Keep equivalent functional groups identical across LULC products.
+# Fields: lulc_veg (0/1), root_depth (mm), kc (annual, dimensionless).
+# Values must be replaced/justified before scientific calibration/comparison.
+status: engineering_trial_only
+provenance: 'Project functional-group priors v1; see docs/M2_PREPROCESSING.md'
+groups:
+  crop: {lulc_veg: 1, root_depth: 1000, kc: 0.65}
+  tree: {lulc_veg: 1, root_depth: 2000, kc: 0.85}
+  shrub: {lulc_veg: 1, root_depth: 1000, kc: 0.65}
+  grass: {lulc_veg: 1, root_depth: 500, kc: 0.65}
+  sparse: {lulc_veg: 1, root_depth: 300, kc: 0.35}
+  bare: {lulc_veg: 0, root_depth: 1, kc: 0.15}
+  built: {lulc_veg: 0, root_depth: 1, kc: 0.30}
+  snow: {lulc_veg: 0, root_depth: 1, kc: 0.05}
+  water: {lulc_veg: 0, root_depth: 1, kc: 1.05}
+  wetland: {lulc_veg: 0, root_depth: 1, kc: 1.00}
+mapping:
+  copernicus:
+    '20': shrub
+    '30': grass
+    '40': crop
+    '50': built
+    '60': sparse
+    '70': snow
+    '80': water
+    '90': wetland
+    '100': grass
+    '111': tree
+    '112': tree
+    '113': tree
+    '114': tree
+    '115': tree
+    '116': tree
+    '121': tree
+    '122': tree
+    '123': tree
+    '124': tree
+    '125': tree
+    '126': tree
+    '200': water
+  fine:
+    '1': crop
+    '2': crop
+    '3': crop
+    '4': tree
+    '5': shrub
+    '6': crop
+    '7': bare
+    '8': bare
+    '9': bare
+    '10': bare
+    '11': sparse
+    '12': bare
+    '13': tree
+    '14': tree
+    '15': tree
+    '16': tree
+    '17': tree
+    '18': grass
+    '19': grass
+    '20': grass
+    '21': grass
+    '22': shrub
+    '23': shrub
+    '24': tree
+    '25': water
+    '26': water
+    '27': wetland
+    '29': snow

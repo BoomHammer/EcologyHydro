@@ -14,10 +14,17 @@ from ecologyhydro.runtime import configure_threads
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="EcologyHydro engineering checks")
-    parser.add_argument("command", choices=("validate-config", "doctor"))
+    parser.add_argument("command", choices=("validate-config", "doctor", "preprocess"))
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--project-root", type=Path)
     parser.add_argument("--require-inputs", action="store_true")
+    parser.add_argument("--recipe", type=Path, default=Path("config/m2.yaml"))
+    parser.add_argument(
+        "--stages",
+        nargs="+",
+        choices=("static", "climate", "landcover", "routing", "quality"),
+        default=["static", "climate", "landcover", "routing", "quality"],
+    )
     args = parser.parse_args(argv)
     try:
         config = load_config(args.config, root=args.project_root)
@@ -33,6 +40,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "validate-config":
         print(config.model_dump_json(indent=2))
         return 0
+    if args.command == "preprocess":
+        from ecologyhydro.supervisor import run_preprocessing
+
+        return run_preprocessing(config, args.config, args.recipe, args.stages)
     try:
         from ecologyhydro.diagnostics import check_environment
 

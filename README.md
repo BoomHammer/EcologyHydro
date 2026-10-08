@@ -1,6 +1,6 @@
 # EcologyHydro
 
-基于 InVEST Annual Water Yield 的黄河流域年径流模拟项目。开发顺序和三个实验的设计见 [DEVELOPMENT.md](DEVELOPMENT.md)。目前已完成 M0 环境与工程初始化，尚未接入真实研究数据或运行流域模拟。
+基于 InVEST Annual Water Yield 的黄河流域年径流模拟项目。开发顺序和三个实验的设计见 [DEVELOPMENT.md](DEVELOPMENT.md)。M0、M1 已完成；M2 已实现真实数据预处理与共享缓存，当前参数包含明确标记的工程试算先验，尚未运行 M3 的 InVEST 模型闭环。见 [M2 使用说明](docs/M2_PREPROCESSING.md)和[M2 验收记录](docs/M2_ACCEPTANCE.md)。
 
 ## 环境
 
@@ -47,10 +47,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 ruff format 
 
 `doctor` 仅使用临时合成数据，完成后清理临时文件；UTF-8 日志和 JSON 报告写入 `project/logs/`。`project/cache/` 保存共享缓存，正式实验结果写入 `experiments/`；这些产物和原始数据均被 Git 忽略。
 
-线程限制已在导入数值库前设置，双进程已通过自检。内存预算与 12 小时上限目前是经过验证的配置约束，实际进程树监控、超时终止、批量调度和全流域性能验收属于 M3，尚未实现。
+线程限制已在导入数值库前设置，双进程已通过自检。M2 入口已提供进程树内存监控与超时终止；模型批量调度和 InVEST 全流域性能验收仍属于 M3。
+
+## M2 预处理
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ecologyhydro preprocess
+```
+
+处理配方为 `config/m2.yaml`。土壤和 CMFD 按 Copernicus 范围生成原生网格裁剪副本，再准备 250 m 等积网格、2019—2023 年降水/PET、两套地类、土壤候选参数及测站汇水区。原始数据不覆盖。
+
+结果索引为 `project/cache/m2/latest.json`。填洼 DEM、流向、汇流累积、非重叠分区和站点归属表均持久保存。更换地类或气候后重跑完整命令即可自动复用未变化的静态成果；输入、参数、实现或依赖版本变化会使相应缓存失效。
+
+正式科学实验前仍需核验生物物理参数和水文修正假设；试算先验集中在 `config/biophysical_priors.yaml`，不会自动写入已验证状态。
 
 ## 开发规则
 
 Python 源码放在 `src/ecologyhydro/`，测试放在 `scripts/test/`。提交前运行测试、`ruff check .` 和 `ruff format --check .`。新增模块通过可编辑安装立即生效；改变依赖后需重新求解、锁定并完成环境自检。
 
-下一步是 M1：盘点实际数据、确定测站及观测口径、划分校准与验证期。`AGENTS.md` 仅由人工修改。
+下一步是 M3：使用已保存输入完成最小模型闭环、评价水文及参数近似，并验证完整模拟性能。`AGENTS.md` 仅由人工修改。

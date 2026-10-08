@@ -1,0 +1,25 @@
+# Reproducible M2 preprocessing recipe; no calibration/validation observations used.
+resolution_m: 250
+projected_crs: '+proj=aea +lat_1=25 +lat_2=47 +lat_0=0 +lon_0=105 +datum=WGS84 +units=m +no_defs'
+extent_reference: data/LCLU/Copernicus_Landcover_100m.tif
+dem: data/DEM/ALOS_DSM_100m.tif
+soil: data/Soil/hwsd.bil
+soil_database: data/Soil/HWSD2.mdb
+soil_crs_assumption: EPSG:4326
+soil_depth_proxy_mm: {'1': 1500, '2': 750, '3': 300, '4': 50}
+soil_depth_status: provisional_class_midpoints_capped_at_200cm
+climate_directory: data/Climate/Data_forcing_01mo_010deg
+pet_directory: data/Climate/TerraClimate_PET
+landcover:
+  copernicus: data/LCLU/Copernicus_Landcover_100m.tif
+  fine: data/LCLU/vegetation_model_20261007_154221plusIce.tif
+class_tables:
+  copernicus: data/LCLU/Copernicus_CGLS_LC100_Mapping.csv
+  fine: data/LCLU/vegetation_model_20261007_154221.csv
+river_network: data/Hydrology/HydroRIVERS_v10_as_shp/HydroRIVERS_v10_as_yellowriver.shp
+stations: data/Hydrology/测站控制面积.csv
+boundary: data/Hydrology/黄河流域.shp
+# Report distances beyond this limit; never silently substitute another river.
+station_review_distance_m: 10000
+# Routing outlet candidates must intersect the verified mainstem, within this radius.
+outlet_search_radius_m: 2000
