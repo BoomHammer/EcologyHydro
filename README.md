@@ -1,6 +1,6 @@
 # EcologyHydro
 
-基于 InVEST Annual Water Yield 的黄河流域年径流模拟项目。开发顺序和三个实验的设计见 [DEVELOPMENT.md](DEVELOPMENT.md)。M0、M1 已完成；M2 已实现真实数据预处理与共享缓存，当前参数包含明确标记的工程试算先验，尚未运行 M3 的 InVEST 模型闭环。见 [M2 使用说明](docs/M2_PREPROCESSING.md)和[M2 验收记录](docs/M2_ACCEPTANCE.md)。
+基于 InVEST Annual Water Yield 的黄河流域年径流模拟项目。开发顺序和三个实验的设计见 [DEVELOPMENT.md](DEVELOPMENT.md)。M0、M1 已完成；M2 已实现真实数据预处理与共享缓存，当前参数包含明确标记的工程试算先验。M3 已完成官方模型全域工程试算和性能验收，科学精度尚未验证。见 [M2 使用说明](docs/M2_PREPROCESSING.md)、[M2 验收记录](docs/M2_ACCEPTANCE.md)和 [M3 验收与运行说明](docs/M3_ACCEPTANCE.md)。
 
 ## 环境
 
@@ -47,7 +47,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 ruff format 
 
 `doctor` 仅使用临时合成数据，完成后清理临时文件；UTF-8 日志和 JSON 报告写入 `project/logs/`。`project/cache/` 保存共享缓存，正式实验结果写入 `experiments/`；这些产物和原始数据均被 Git 忽略。
 
-线程限制已在导入数值库前设置，双进程已通过自检。M2 入口已提供进程树内存监控与超时终止；模型批量调度和 InVEST 全流域性能验收仍属于 M3。
+线程限制已在导入数值库前设置，双进程已通过自检。M2 入口已提供进程树内存监控与超时终止；M3 已实现模型任务调度、成功结果校验复用，并完成两套地类全域性能验收。
 
 ## M2 预处理
 
@@ -65,4 +65,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ec
 
 Python 源码放在 `src/ecologyhydro/`，测试放在 `scripts/test/`。提交前运行测试、`ruff check .` 和 `ruff format --check .`。新增模块通过可编辑安装立即生效；改变依赖后需重新求解、锁定并完成环境自检。
 
-下一步是 M3：使用已保存输入完成最小模型闭环、评价水文及参数近似，并验证完整模拟性能。`AGENTS.md` 仅由人工修改。
+M3 入口为 `python -m ecologyhydro simulate`（单次）和 `python -m ecologyhydro trial`（工程套件），通过上述 `scripts/run.ps1` 启动。结果位于 `project/m3/`，完整命令与实测数据见 [M3 验收记录](docs/M3_ACCEPTANCE.md)。下一步是 M4：先复核科学参数和水文近似，再率定与独立验证。`AGENTS.md` 仅由人工修改。
