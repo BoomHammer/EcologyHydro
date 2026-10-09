@@ -1,0 +1,14 @@
+{
+  "name": "major_bias_two_parameter_calibration",
+  "status": "independent_test_complete_accuracy_not_accepted",
+  "training_years": [2019, 2020, 2021, 2022],
+  "test_year": 2023,
+  "training_summary": "project/calibration/major_bias/summary.json",
+  "parameters": "project/calibration/major_bias/parameters.json",
+  "frozen_training": "project/calibration/major_bias/holdout_2023/frozen_training.json",
+  "test_summary": "project/calibration/major_bias/holdout_2023/summary.json",
+  "report": "docs/MAJOR_BIAS_CALIBRATION.md",
+  "target": "observed_regulated_runoff",
+  "next_priority": "explicit_water_use_and_reservoir_storage_in_runoff_operator",
+  "policy": "Preserve this frozen test; no automatic retuning or landcover winner declaration"
+}

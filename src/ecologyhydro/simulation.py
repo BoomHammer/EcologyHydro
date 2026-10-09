@@ -35,7 +35,58 @@ def valid_completed(record):
     )
 
 
-def execute_trial(config, index_path, run_dir, year, landcover, scope, z, force=False):
+def validate_et_override(path, zones_path, label="ET0"):
+    """Require complete nonnegative annual climate on the prepared model grid."""
+    import numpy as np
+    from osgeo import gdal
+
+    from ecologyhydro.spatial import windows
+
+    with gdal.Open(str(path)) as source, gdal.Open(str(zones_path)) as zones:
+        if (
+            source.GetGeoTransform() != zones.GetGeoTransform()
+            or not source.GetSpatialRef().IsSame(zones.GetSpatialRef())
+            or (source.RasterXSize, source.RasterYSize) != (zones.RasterXSize, zones.RasterYSize)
+        ):
+            raise ValueError(f"Scenario {label} grid mismatch")
+        for block in windows(zones):
+            inside = zones.ReadAsArray(*block) > 0
+            values = source.ReadAsArray(*block)
+            valid = source.GetRasterBand(1).GetMaskBand().ReadAsArray(*block) > 0
+            if np.any(inside & (~valid | ~np.isfinite(values) | (values < 0))):
+                raise ValueError(f"Scenario {label} missing or invalid inside watershed")
+
+
+def validate_climate_scenario(scenario, zones_path, year):
+    for key, label in (("eto_path", "et0_label"), ("precipitation_path", "precipitation_label")):
+        if key not in scenario["overrides"]:
+            continue
+        if scenario.get("year") != year:
+            raise ValueError("Climate scenario requires an explicit matching year")
+        if not scenario.get(label):
+            raise ValueError(f"Climate scenario requires {label}")
+        validate_et_override(scenario["overrides"][key], zones_path, label)
+
+
+def climate_label(prepared):
+    scenario = prepared.get("science_scenario", {})
+    rain = scenario.get("precipitation_label", f"CMFD_{prepared['precipitation']}")
+    et = scenario.get("et0_label", "TerraClimate_PET")
+    return f"{rain}+{et}"
+
+
+def execute_trial(
+    config,
+    index_path,
+    run_dir,
+    year,
+    landcover,
+    scope,
+    z,
+    force=False,
+    scenario_path=None,
+    holdout_manifest=None,
+):
     from osgeo import gdal, ogr
 
     from ecologyhydro.aggregation import (
@@ -51,7 +102,11 @@ def execute_trial(config, index_path, run_dir, year, landcover, scope, z, force=
     gdal.UseExceptions()
     ogr.UseExceptions()
     gdal.SetCacheMax(128 * 1024**2)
-    if year not in config.study.calibration_years:
+    if holdout_manifest is not None:
+        from ecologyhydro.holdout import verify_holdout
+
+        verify_holdout(holdout_manifest, config, year, landcover, z, scenario_path, index_path)
+    elif year not in config.study.calibration_years:
         raise ValueError("M3 engineering trials are restricted to calibration years")
     if not 1 <= z <= 30:
         raise ValueError("Engineering Z must be finite and between 1 and 30")
@@ -74,15 +129,39 @@ def execute_trial(config, index_path, run_dir, year, landcover, scope, z, force=
         "parameter_status": "engineering_trial_not_calibrated",
         "timings_seconds": {},
     }
+    if holdout_manifest is not None:
+        state["parameter_status"] = "frozen_calibration_independent_holdout"
     write_json(run_dir / "run.json", state)
     try:
         prepared = prepare_inputs(index_path, config.paths.cache, year, landcover, scope)
+        if scenario_path is not None:
+            scenario = json.loads(Path(scenario_path).read_text(encoding="utf-8"))
+            allowed = {
+                "biophysical_table_path",
+                "depth_to_root_rest_layer_path",
+                "eto_path",
+                "precipitation_path",
+            }
+            if set(scenario["overrides"]) - allowed:
+                raise ValueError("Unsupported science scenario override")
+            if scenario["landcover"] != landcover or scenario["scope"] != scope:
+                raise ValueError("Scenario landcover/scope mismatch")
+            if scenario.get("year", year) != year:
+                raise ValueError("Scenario year mismatch")
+            validate_climate_scenario(scenario, prepared["zones"], year)
+            prepared["args"].update(scenario["overrides"])
+            prepared["science_scenario"] = scenario
+            state["science_scenario"] = scenario["name"]
         state["timings_seconds"]["input_verification_and_preparation"] = (
             time.perf_counter() - started
         )
         observation = config.paths.hydrology / "实测年径流量2018-2023.csv"
         source_files = [Path(path) for path in prepared["args"].values()]
         source_files += [Path(prepared["zones"]), Path(prepared["zone_station"]), observation]
+        if scenario_path is not None:
+            source_files.append(Path(scenario_path))
+        if holdout_manifest is not None:
+            source_files.append(Path(holdout_manifest))
         source_files += [
             Path(__file__),
             Path(__file__).with_name("aggregation.py"),
@@ -167,6 +246,8 @@ def execute_trial(config, index_path, run_dir, year, landcover, scope, z, force=
             prepared["precipitation"],
             prepared["station_limit"],
         )
+        for row in totals:
+            row["climate"] = climate_label(prepared)
         if [row["station"] for row in totals] != config.study.station_ids[
             : prepared["station_limit"]
         ]:
@@ -236,6 +317,8 @@ def main():
     parser.add_argument("--scope", choices=["tangnaihai", "full"], required=True)
     parser.add_argument("--z", type=float, required=True)
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--scenario", type=Path)
+    parser.add_argument("--holdout-manifest", type=Path)
     args = parser.parse_args()
     config = load_config(args.config)
     configure_threads(config.resources)
@@ -248,6 +331,8 @@ def main():
         args.scope,
         args.z,
         args.force,
+        args.scenario,
+        args.holdout_manifest,
     )
 
 

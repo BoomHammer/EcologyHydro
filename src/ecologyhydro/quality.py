@@ -162,11 +162,13 @@ def coverage(aligned, scope_path, class_tables, output):
 
 def precipitation_comparison(report, zones_path, observed_path, calibration_years, output):
     """Compare only calibration years; lower reach extent mismatch stays excluded."""
+    from ecologyhydro.reference_checks import REGIONS
+
     with observed_path.open(encoding="utf-8-sig", newline="") as stream:
-        observed = list(csv.DictReader(stream))
+        observed = {row["水资源二级区"]: row for row in csv.DictReader(stream)}
     results = []
     # Station indices: Guide=2, Lanzhou=3, Toudaoguai=6, Longmen=7, Sanmenxia=8, Huayuankou=9.
-    groups = [(0, 2), (2, 3), (3, 6), (6, 7), (7, 8), (8, 9), (9, 11)]
+    groups = REGIONS
     with gdal.Open(str(zones_path)) as zones:
         pixel_area = abs(zones.GetGeoTransform()[1] * zones.GetGeoTransform()[5])
         for variable in ("prec", "bcpr"):
@@ -185,15 +187,15 @@ def precipitation_comparison(report, zones_path, observed_path, calibration_year
                         counts += np.bincount(ids.ravel(), minlength=12)
                         valid_counts += np.bincount(ids[valid], minlength=12)
                         totals += np.bincount(ids[valid], weights=data[valid], minlength=12)
-                for index, (start, end) in enumerate(groups):
+                for index, (region, start, end) in enumerate(groups):
                     expected = counts[start + 1 : end + 1].sum()
                     actual = valid_counts[start + 1 : end + 1].sum()
                     volume = totals[start + 1 : end + 1].sum() * pixel_area / 1e11
-                    record = observed[index]
+                    record = observed[region]
                     observation = float(record[str(year)])
                     results.append(
                         {
-                            "region": next(iter(record.values())),
+                            "region": region,
                             "year": year,
                             "variable": variable,
                             "volume_1e8_m3": volume,
@@ -225,11 +227,14 @@ def precipitation_comparison(report, zones_path, observed_path, calibration_year
     }
     if not all(np.isfinite(score) for score in scores.values()):
         raise ValueError("No usable calibration precipitation comparison")
+    selected = report["recipe"].get("precipitation_baseline", "prec")
+    if selected not in scores:
+        raise ValueError("Unknown explicit precipitation baseline")
     return {
         "years_used": calibration_years,
-        "trial_selection": min(scores, key=scores.get),
+        "trial_selection": selected,
         "mean_absolute_relative_volume_difference": scores,
-        "selection_rule": "first six endpoint-matched intervals, calibration years only",
+        "selection_rule": "explicit recipe baseline; table differences are diagnostic only",
         "limitation": "provisional comparison; statistical boundaries differ; no rescaling applied",
         "validation_observations_used": False,
     }
@@ -242,6 +247,7 @@ def prepare_quality(config, report):
         Path(__file__),
         Path(__file__).with_name("spatial.py"),
         Path(__file__).with_name("cache.py"),
+        Path(__file__).with_name("reference_checks.py"),
     ]
     boundary = root / report["recipe"]["boundary"]
     template = Path(report["aligned"]["dem"])
@@ -291,12 +297,41 @@ def prepare_quality(config, report):
         artifact = cache.build(
             "quality/precipitation",
             [scopes["watersheds"], observation, *map(Path, report["aligned"].values()), *code],
-            {"calibration_years": config.study.calibration_years},
+            {
+                "calibration_years": config.study.calibration_years,
+                "precipitation_baseline": report["recipe"].get("precipitation_baseline", "prec"),
+            },
             lambda out: precipitation_comparison(
                 report, scopes["watersheds"], observation, config.study.calibration_years, out
             ),
         )
         results["precipitation"] = str(artifact)
+        from ecologyhydro.reference_checks import reference_checks
+
+        station_table = root / report["recipe"]["stations"]
+        area_table = config.paths.hydrology / "水资源二级区面积.csv"
+        thresholds = report["recipe"].get(
+            "reference_review",
+            {
+                "area_relative_difference": 0.15,
+                "precipitation_volume_relative_difference": 0.30,
+                "precipitation_depth_relative_difference": 0.25,
+            },
+        )
+        references = cache.build(
+            "quality/reference_checks",
+            [scopes["watersheds"], station_table, area_table, artifact / "manifest.json", *code],
+            thresholds,
+            lambda out: reference_checks(
+                scopes["watersheds"],
+                station_table,
+                area_table,
+                artifact / "precipitation_comparison.csv",
+                thresholds,
+                out,
+            ),
+        )
+        results["references"] = str(references)
     readiness = {
         "engineering_ready": False,
         "formal_experiment_ready": False,
@@ -316,6 +351,20 @@ def prepare_quality(config, report):
             and coverage_report["dem_edge_touch_pixels"] == 0
             and "biophysical" in report
         )
+        if report["recipe"].get("closed_lakes"):
+            readiness["routing_constraints_passed"] = all(
+                report.get(key, {}).get("passed", False)
+                for key in ("closed_lake_acceptance", "inland_channel_acceptance")
+            )
+            readiness["engineering_ready"] &= readiness["routing_constraints_passed"]
+        reference_report = json.loads(
+            (Path(results["references"]) / "manifest.json").read_text(encoding="utf-8")
+        )["details"]
+        readiness["reference_review_required"] = reference_report["review_required"]
+        readiness["reference_alerts"] = {
+            key: reference_report[key]
+            for key in ("station_alerts", "region_alerts", "precipitation_alert_rows")
+        }
     report["readiness"] = readiness
     report["quality"] = results
     report["cache_events"].extend(cache.events)

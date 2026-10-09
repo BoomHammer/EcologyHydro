@@ -1,68 +1,78 @@
-# EcologyHydro
+# 黄河流域年度径流模拟
 
-基于 InVEST Annual Water Yield 的黄河流域年径流模拟项目。开发顺序和三个实验的设计见 [DEVELOPMENT.md](DEVELOPMENT.md)。M0、M1 已完成；M2 已实现真实数据预处理与共享缓存，当前参数包含明确标记的工程试算先验。M3 已完成官方模型全域工程试算和性能验收，科学精度尚未验证。见 [M2 使用说明](docs/M2_PREPROCESSING.md)、[M2 验收记录](docs/M2_ACCEPTANCE.md)和 [M3 验收与运行说明](docs/M3_ACCEPTANCE.md)。
+基于 InVEST Annual Water Yield（AWY），使用精细分类和 Copernicus 两套土地覆盖，模拟黄河干流 11 个测站的年水量，为后续 CMIP6 和土地覆盖变化实验提供基础。
 
-## 环境
+**研究推进暂告一段落。第一轮率定及 2023 测试已完成，精度尚未验收。** 当前实验由 [runoff_experiment.json](config/runoff_experiment.json) 定位。
 
-已验证 Windows x86-64、Python 3.12.15、InVEST 3.20.2、GDAL 3.10.3。全部原生依赖来自 conda-forge，具体版本、构建和下载校验值保存在 [环境锁文件](locks/conda-win-64.lock)。
+| 土地覆盖 | 原工程基线训练 MAPE | 率定后训练 MAPE | 2023 测试 MAPE |
+| --- | ---: | ---: | ---: |
+| 精细分类 | 316.46% | 14.46% | 41.10% |
+| Copernicus | 342.33% | 14.00% | 42.15% |
 
-采用项目内 micromamba 环境 `.venv/`，`uv` 仅用于无依赖的本项目可编辑安装及依赖检查。GDAL 与 InVEST 的原生库由同一包管理器提供，这是 [InVEST 官方推荐的安装方式](https://invest.readthedocs.io/en/stable/installing.html)。环境选择及验收记录见 [M0 环境说明](docs/M0_ENVIRONMENT.md)。
+训练为 2019—2022 年。当前直接拟合受调控实测径流，尚未显式处理沿程耗水和水库蓄变，不能据此认定精细分类稳定更优。2023 已用于测试，后续参考其误差改模型时须标为复用测试年。
 
-在项目根目录的 PowerShell 执行以下命令。`ExecutionPolicy Bypass` 只作用于该次子进程，不修改系统执行策略：
+## 阅读入口
+
+- [开发状态与下一步](DEVELOPMENT.md)：进度、优先事项及实验约束。
+- [数据说明](docs/DATA_DESCRIPTION.md)：数据、单位、确认口径和已知冲突。
+- [预处理](docs/M2_PREPROCESSING.md)：网格、土壤、湖泊、内流河与缓存。
+- [参数来源](docs/M4_PARAMETER_SOURCES.md)：文献、轮作近似和率定参数。
+- [本轮结果](docs/MAJOR_BIAS_CALIBRATION.md)：方法、冻结测试及性能。
+- [输出字段](docs/OUTPUT_FIELDS.md)：产水、实测径流及指标含义。
+
+## 环境与检查
+
+在项目根目录用 PowerShell 执行。项目使用独立 Windows x64 环境：Python 3.12、InVEST 3.20.2、GDAL 3.10 系列；具体构建见 `locks/conda-win-64.lock`。已有环境直接使用 `scripts/run.ps1`，新环境才执行：
 
 ```powershell
-# 新机器上从锁文件创建环境；已有匹配环境时只核验并重装本项目代码。
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
-
-# 验证配置结构，输出解析后的绝对路径。
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ecologyhydro validate-config
-
-# 检查原生模块、栅格/矢量读写及 TaskGraph 双进程计算。
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ecologyhydro doctor
-
-# 运行测试与代码规范检查。
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m pytest
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 ruff check .
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 ruff format --check .
 ```
 
-`scripts/run.ps1` 会定位项目根目录并在独立环境中执行命令；不会依赖系统默认 Python 或已激活的 Anaconda 环境。IDE 可选择 `.venv/python.exe`，原生库运行仍推荐通过脚本或正确激活该 conda 环境。
-
-不要在本环境中直接执行 `uv sync` 或用 pip 升级 GDAL；本项目的完整锁是 conda 显式锁，不是 `uv.lock`。`environment.yml` 用于有意更新依赖时重新求解，不能替代精确锁文件。
-
-## 配置与目录
-
-编辑 [config.yaml](config.yaml)，所有相对路径均相对于项目根目录，即使配置文件位于 `config/` 也不改变此规则。未知字段、重复 YAML 键、重复站点、校准/验证年份重叠、无效资源预算都会报错。
-
-| 配置 | 用途 |
-| --- | --- |
-| `paths` | 气象、DEM、土地覆盖、土壤、`data/Hydrology/` 观测数据及缓存、日志、实验目录 |
-| `study` | 站点、校准/验证年份、投影和分辨率；M1/M2 补齐 |
-| `inputs` | AWY 所需文件路径及数据版本；目前为未配置状态 |
-| `model.z_parameter` | 率定参数，未指定默认科学值 |
-| `resources` | 初始并发上限 2、每进程数值库线程 1、内存预算 24 GB、超时上限 12 小时 |
-| `random_seed`、`log_level` | 随机种子及日志级别 |
-
-`validate-config` 接受 M0 的空研究参数；加入 `--require-inputs` 后会检查所需文件、站点、网格参数与 Z 是否已填写。当前模板运行该模式应以退出码 2 拒绝启动。空间一致性与正式模型校验在 M2/M3 实现。
-
-`doctor` 仅使用临时合成数据，完成后清理临时文件；UTF-8 日志和 JSON 报告写入 `project/logs/`。`project/cache/` 保存共享缓存，正式实验结果写入 `experiments/`；这些产物和原始数据均被 Git 忽略。
-
-线程限制已在导入数值库前设置，双进程已通过自检。M2 入口已提供进程树内存监控与超时终止；M3 已实现模型任务调度、成功结果校验复用，并完成两套地类全域性能验收。
-
-## M2 预处理
+常用检查：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ecologyhydro preprocess
+./scripts/run.ps1 python -m ecologyhydro doctor
+./scripts/run.ps1 python -m pytest
+./scripts/run.ps1 python -m ruff check src scripts
+./scripts/run.ps1 python -m ruff format --check src scripts
 ```
 
-处理配方为 `config/m2.yaml`。土壤和 CMFD 按 Copernicus 范围生成原生网格裁剪副本，再准备 250 m 等积网格、2019—2023 年降水/PET、两套地类、土壤候选参数及测站汇水区。原始数据不覆盖。
+若执行策略阻止脚本，使用 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 ...`。
 
-结果索引为 `project/cache/m2/latest.json`。填洼 DEM、流向、汇流累积、非重叠分区和站点归属表均持久保存。更换地类或气候后重跑完整命令即可自动复用未变化的静态成果；输入、参数、实现或依赖版本变化会使相应缓存失效。
+## 当前结果复核
 
-正式科学实验前仍需核验生物物理参数和水文修正假设；试算先验集中在 `config/biophysical_priors.yaml`，不会自动写入已验证状态。
+```powershell
+./scripts/run.ps1 python scripts/calibrate_major_bias.py --verify-only
+./scripts/run.ps1 python scripts/validate_major_bias.py
+```
 
-## 开发规则
+第一条复算或复用已选训练参数，第二条校验冻结输入并复算或复用 2023 测试。原实验已冻结，不允许原地重新率定。历史工程基线由 `config/analysis_baseline.json` 定位。
 
-Python 源码放在 `src/ecologyhydro/`，测试放在 `scripts/test/`。提交前运行测试、`ruff check .` 和 `ruff format --check .`。新增模块通过可编辑安装立即生效；改变依赖后需重新求解、锁定并完成环境自检。
+`config.yaml` 管理年份、资源和路径；通用输入及 Z 的空值是模板占位，实际任务从 M2 索引、情景和冻结参数装配，无需逐项人工补填。预处理配方见 `config/m2.yaml`。
 
-M3 入口为 `python -m ecologyhydro simulate`（单次）和 `python -m ecologyhydro trial`（工程套件），通过上述 `scripts/run.ps1` 启动。结果位于 `project/m3/`，完整命令与实测数据见 [M3 验收记录](docs/M3_ACCEPTANCE.md)。下一步是 M4：先复核科学参数和水文近似，再率定与独立验证。`AGENTS.md` 仅由人工修改。
+## 目录与脚本
+
+| 路径 | 用途 |
+| --- | --- |
+| `data/` | 原始数据 |
+| `config/` | 配方、先验与实验索引 |
+| `src/ecologyhydro/` | 预处理、模型执行、汇总、试验和冻结校验 |
+| `scripts/test/` | 自动化测试 |
+| `project/cache/` | 基础数据缓存及指纹 |
+| `project/calibration/major_bias/` | 当前训练、参数与冻结测试结果 |
+| `project/repairs/`、`project/m4/` | 修复基线及历史诊断产物 |
+| `experiments/` | 通用模拟入口的运行输出 |
+| `docs/` | 五份专题文档 |
+
+除环境脚本外，保留以下入口：
+
+- `fetch_climate_reference.py`、`check_provider_climate.py`：提供方气候下载及转换。
+- `calibrate_major_bias.py`、`validate_major_bias.py`：训练与冻结测试。
+- `audit_routing_topology.py`、`check_m2_repairs.py`：河网和修复检查。
+- `audit_sector_water.py`：行业供耗水核对。
+- `audit_m4.py`、`audit_model_chain.py`：水量账户和独立方程审计；其函数也用于回归测试，完整入口针对历史基线。
+- `inspect_run_yield.py`：运行栅格数值诊断。
+- `run_repaired_baseline.py`：历史固定参数基线重建，会写入基线索引；当前冻结实验无需执行。
+- `export_mod16a2gf_gee.js`：可选蒸散导出，目前暂停使用。
+
+分块读取、依赖缓存和双进程并发控制资源；每模型内部单线程，进程树预算 24 GiB、单次上限 12 小时。`AGENTS.md` 仅由人工修改。

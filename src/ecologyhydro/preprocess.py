@@ -17,7 +17,7 @@ from ecologyhydro.climate import annual_pet, annual_precipitation, crop_netcdf
 from ecologyhydro.config import UniqueKeyLoader, load_config, project_root
 from ecologyhydro.logging_utils import configure_logging
 from ecologyhydro.runtime import configure_threads
-from ecologyhydro.spatial import ALBERS, NODATA, bounds, crop_soil, make_grid, warp
+from ecologyhydro.spatial import ALBERS, bounds, crop_soil, make_grid, warp
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,52 +26,36 @@ def code_inputs():
     return sorted(Path(__file__).parent.glob("*.py"))
 
 
-def soil_parameters(source, table, depth_lookup, output):
-    from ecologyhydro.spatial import write_raster
-
-    depth_lookup = {int(key): value for key, value in depth_lookup.items()}
-    pawc = np.full(65536, NODATA, dtype=np.float32)
-    depth = pawc.copy()
-    seen = set()
-    with table.open(encoding="utf-8-sig", newline="") as stream:
-        for row in csv.DictReader(stream):
-            code = int(row["HWSD2_SMU_ID"])
-            if code in seen:
-                raise ValueError(f"Duplicate SMU: {code}")
-            seen.add(code)
-            awc = float(row["AWC"] or "nan")
-            root_class = int(row["ROOT_DEPTH"] or 0)
-            if np.isfinite(awc) and 0 <= awc <= 1000 and root_class in depth_lookup:
-                pawc[code] = awc / 1000
-                depth[code] = depth_lookup[root_class]
-    with gdal.Open(str(source)) as dataset:
-        codes = dataset.ReadAsArray()
-        for name, lookup in (("pawc", pawc), ("root_depth", depth)):
-            write_raster(
-                output / f"{name}.tif",
-                lookup[codes],
-                dataset.GetGeoTransform(),
-                dataset.GetProjection(),
-            )
-    return {
-        "pawc_method": "HWSD2_SMU representative AWC (mm/m) / 1000; no duplicate coarse correction",
-        "depth_proxy_mm": depth_lookup,
-        "depth_status": "provisional, not measured depth",
-        "unmapped_codes": [int(c) for c in np.unique(codes) if pawc[c] == NODATA],
-    }
-
-
 def export_soil_table(database, output):
     import sys
 
     sys.path.insert(0, str(project_root() / ".tools/mdb-reader"))
     from access_parser import AccessParser
 
-    table = AccessParser(str(database)).parse_table("HWSD2_SMU")
+    database = AccessParser(str(database))
+    table = database.parse_table("HWSD2_SMU")
     with (output / "smu.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.writer(stream)
         writer.writerow(table)
         writer.writerows(zip(*table.values(), strict=True))
+    layers = database.parse_table("HWSD2_LAYERS")
+    fields = [
+        "HWSD2_SMU_ID",
+        "LAYER",
+        "TOPDEP",
+        "BOTDEP",
+        "TEXTURE_USDA",
+        "COARSE",
+        "CEC_CLAY",
+        "ELEC_COND",
+        "FAO90",
+    ]
+    with (output / "layers.csv").open("w", encoding="utf-8-sig", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(fields)
+        for i, sequence in enumerate(layers["SEQUENCE"]):
+            if sequence == 1:
+                writer.writerow([layers[f][i] for f in fields])
 
 
 def prepare(config, recipe_path, stages):
@@ -133,6 +117,8 @@ def prepare(config, recipe_path, stages):
             )
             paths[f"pet_{year}"] = str(native / "annual.tif")
     if "static" in stages:
+        from ecologyhydro.soil import soil_parameters
+
         source = root / recipe["soil"]
         soil = cache.build(
             "static/soil_crop",
@@ -143,12 +129,17 @@ def prepare(config, recipe_path, stages):
         table = cache.build(
             "static/soil_table",
             [root / recipe["soil_database"], directory / "preprocess.py"],
-            {"table": "HWSD2_SMU"},
+            {"tables": ["HWSD2_SMU", "HWSD2_LAYERS sequence 1"]},
             lambda out: export_soil_table(root / recipe["soil_database"], out),
         )
         parameters = cache.build(
             "static/soil_parameters",
-            [soil / "manifest.json", table / "manifest.json", directory / "preprocess.py"],
+            [
+                soil / "manifest.json",
+                table / "manifest.json",
+                directory / "preprocess.py",
+                directory / "soil.py",
+            ],
             {"depth": recipe["soil_depth_proxy_mm"]},
             lambda out: soil_parameters(
                 soil / "codes.tif", table / "smu.csv", recipe["soil_depth_proxy_mm"], out
@@ -205,8 +196,20 @@ def prepare(config, recipe_path, stages):
             report["aligned"] = previous["aligned"] | aligned
             if "biophysical" not in report and "biophysical" in previous:
                 report["biophysical"] = previous["biophysical"]
-            if not aligned and "routing" in previous:
-                report["routing"] = previous["routing"]
+            if "routing" in previous and report["aligned"].get("dem") == previous["aligned"].get(
+                "dem"
+            ):
+                for key in ("routing", "closed_lake_acceptance", "inland_channel_acceptance"):
+                    if key in previous:
+                        report[key] = previous[key]
+            if "landcover" not in stages:
+                for key in ("lake_overlay", "original_aligned_landcover"):
+                    if key in previous:
+                        report[key] = previous[key]
+    if "landcover" in stages:
+        from ecologyhydro.lakes import prepare_lake_overlay
+
+        prepare_lake_overlay(config, report)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     return report
 

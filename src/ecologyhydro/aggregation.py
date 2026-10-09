@@ -9,6 +9,10 @@ from osgeo import gdal, ogr
 
 from ecologyhydro.spatial import windows
 
+# Float32 Fu evaluation can yield tiny negatives at the zero-yield limit.
+# Keep real negative yields invalid and report every numerical correction.
+YIELD_ROUNDOFF_TOLERANCE_MM = 0.0005
+
 
 def read_observations(path, year):
     result = {}
@@ -35,6 +39,7 @@ def zone_volumes(yield_path, zones_path, precipitation_path=None, aet_path=None)
     valid_counts = counts.copy()
     sums = np.zeros(256, dtype=np.float64)
     balance_error = 0.0
+    roundoff_cells, roundoff_mm_pixels, minimum_raw_yield = 0, 0.0, 0.0
     with ExitStack() as stack:
         zones = stack.enter_context(gdal.Open(str(zones_path)))
         wyield = stack.enter_context(gdal.Open(str(yield_path)))
@@ -58,14 +63,19 @@ def zone_volumes(yield_path, zones_path, precipitation_path=None, aet_path=None)
             inside = ids > 0
             values = wyield.ReadAsArray(*block)
             valid = inside & (wyield.GetRasterBand(1).GetMaskBand().ReadAsArray(*block) != 0)
-            valid &= np.isfinite(values) & (values >= 0)
+            valid &= np.isfinite(values) & (values >= -YIELD_ROUNDOFF_TOLERANCE_MM)
             if np.any(inside & ~valid):
                 raise ValueError(
                     "Missing/negative model yield inside watershed; no silent area loss"
                 )
             counts += np.bincount(ids.ravel(), minlength=256)
             valid_counts += np.bincount(ids[valid], minlength=256)
-            sums += np.bincount(ids[valid], weights=values[valid], minlength=256)
+            tiny_negative = valid & (values < 0)
+            if tiny_negative.any():
+                roundoff_cells += int(tiny_negative.sum())
+                roundoff_mm_pixels -= float(values[tiny_negative].sum(dtype=float))
+                minimum_raw_yield = min(minimum_raw_yield, float(values[tiny_negative].min()))
+            sums += np.bincount(ids[valid], weights=np.maximum(values[valid], 0), minlength=256)
             if "precipitation" in related and "aet" in related:
                 rain = related["precipitation"].ReadAsArray(*block)
                 aet = related["aet"].ReadAsArray(*block)
@@ -90,7 +100,14 @@ def zone_volumes(yield_path, zones_path, precipitation_path=None, aet_path=None)
         for i in range(1, 256)
         if counts[i]
     ]
-    return records, {"maximum_water_balance_error_mm": balance_error, "pixel_area_m2": pixel_area}
+    return records, {
+        "maximum_water_balance_error_mm": balance_error,
+        "pixel_area_m2": pixel_area,
+        "yield_roundoff_tolerance_mm": YIELD_ROUNDOFF_TOLERANCE_MM,
+        "negative_roundoff_cells": roundoff_cells,
+        "negative_roundoff_correction_m3": roundoff_mm_pixels * pixel_area / 1000,
+        "minimum_raw_yield_mm": minimum_raw_yield,
+    }
 
 
 def official_volume_check(records, vector_path):

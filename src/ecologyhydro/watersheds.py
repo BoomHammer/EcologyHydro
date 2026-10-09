@@ -193,7 +193,7 @@ def routing_step(source, target, operation, output):
         shutil.rmtree(work)
 
 
-def make_outlets(mainstem, stations, accumulation, radius, output):
+def make_outlets(mainstem, stations, accumulation, radius, output, channel_path=None):
     with gdal.Open(str(accumulation)) as raster:
         gt = raster.GetGeoTransform()
         inverse = gdal.InvGeoTransform(gt)
@@ -224,10 +224,18 @@ def make_outlets(mainstem, stations, accumulation, radius, output):
                 data = raster.ReadAsArray(x0, y0, width, height)
                 yy, xx = np.indices(data.shape)
                 squared = ((xx + x0 + 0.5 - cx) * gt[1]) ** 2 + ((yy + y0 + 0.5 - cy) * gt[5]) ** 2
-                eligible = (mask.ReadAsArray() == 1) & (squared <= radius**2) & (data > 0)
+                if channel_path is not None:
+                    path_cells = np.load(channel_path)
+                    channel_mask = np.zeros(data.shape, dtype=bool)
+                    pxs, pys = path_cells[:, 0] - x0, path_cells[:, 1] - y0
+                    local = (pxs >= 0) & (pys >= 0) & (pxs < width) & (pys < height)
+                    channel_mask[pys[local], pxs[local]] = True
+                else:
+                    channel_mask = mask.ReadAsArray() == 1
+                eligible = channel_mask & (squared <= radius**2) & (data > 0)
                 if not eligible.any():
                     raise ValueError(f"No mainstem-intersecting outlet for {station['station']}")
-                y, x = np.unravel_index(np.where(eligible, data, -1).argmax(), data.shape)
+                y, x = np.unravel_index(np.where(eligible, squared, np.inf).argmin(), data.shape)
                 px, py = gdal.ApplyGeoTransform(gt, x0 + int(x) + 0.5, y0 + int(y) + 0.5)
                 point = ogr.Geometry(ogr.wkbPoint)
                 point.AddPoint_2D(px, py)
@@ -249,7 +257,10 @@ def make_outlets(mainstem, stations, accumulation, radius, output):
     (output / "outlets.json").write_text(
         json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    return {"stations": records, "constraint": "only pixels intersecting identified mainstem"}
+    return {
+        "stations": records,
+        "constraint": "nearest pixel on enforced mainstem; no accumulation maximization",
+    }
 
 
 def delineate(direction, outlets, output):
@@ -380,6 +391,34 @@ def prepare_watersheds(config, report):
     if match_report["review_required"]:
         raise ValueError(f"Station distance exceeds review limit; see {matched}")
     dem = Path(report["aligned"]["dem"])
+    from ecologyhydro.endorheic import check_exclusion, closed_lake_mask, inland_channel_mask
+
+    lakes = cache.build(
+        "routing/closed_lakes",
+        [
+            Path(
+                report.get("original_aligned_landcover", {}).get(
+                    "copernicus", report["aligned"]["lulc_copernicus"]
+                )
+            ),
+            Path(__file__).with_name("endorheic.py"),
+            *code,
+        ],
+        {"lakes": recipe["closed_lakes"]},
+        lambda out: closed_lake_mask(
+            report.get("original_aligned_landcover", {}).get(
+                "copernicus", report["aligned"]["lulc_copernicus"]
+            ),
+            recipe["closed_lakes"],
+            out,
+        ),
+    )
+    inland = cache.build(
+        "routing/inland_channels",
+        [*inputs, dem, Path(__file__).with_name("endorheic.py"), *code],
+        {"policy": "mapped_endorheic_collection_domain"},
+        lambda out: inland_channel_mask(network, dem, out),
+    )
     conditioned = cache.build(
         "routing/conditioned_dem",
         [
@@ -387,13 +426,29 @@ def prepare_watersheds(config, report):
             matched / "manifest.json",
             *inputs,
             Path(__file__).with_name("conditioning.py"),
+            Path(__file__).with_name("channel_network.py"),
+            lakes / "manifest.json",
+            inland / "manifest.json",
             *code,
         ],
-        {"burn_depth_m": 5},
-        lambda out: condition_dem(dem, matched / "mainstem.gpkg", network, out),
+        {"burn_depth_m": 5, "tributary_min_upstream_km2": recipe["tributary_min_upstream_km2"]},
+        lambda out: condition_dem(
+            dem,
+            matched / "mainstem.gpkg",
+            network,
+            out,
+            closed_lakes=lakes / "mask.tif",
+            inland_channels=inland / "mask.tif",
+            tributary_min_area=recipe["tributary_min_upstream_km2"],
+        ),
     )
     previous = conditioned / "dem.tif"
-    artifacts = {"mainstem": str(matched), "conditioning": str(conditioned)}
+    artifacts = {
+        "mainstem": str(matched),
+        "conditioning": str(conditioned),
+        "closed_lakes": str(lakes),
+        "inland_channels": str(inland),
+    }
     for name in ("fill", "direction", "accumulation"):
         current = cache.build(
             f"routing/{name}",
@@ -413,21 +468,25 @@ def prepare_watersheds(config, report):
                 ],
                 {},
                 lambda out, src=previous: enforce_channel(
-                    src, conditioned / "channel_cells.npy", out
+                    src,
+                    conditioned / "channel_cells.npy",
+                    out,
+                    network_edges=conditioned / "network_edges.npy",
                 ),
             )
             previous = enforced / "data.tif"
         artifacts[name] = str(previous)
     outlets = cache.build(
         "routing/outlets",
-        [matched / "manifest.json", previous, *code],
-        {"radius": recipe["outlet_search_radius_m"]},
+        [matched / "manifest.json", previous, conditioned / "channel_cells.npy", *code],
+        {"radius": recipe["outlet_search_radius_m"], "method": recipe["outlet_method"]},
         lambda out: make_outlets(
             matched / "mainstem.gpkg",
             match_report["stations"],
             previous,
             recipe["outlet_search_radius_m"],
             out,
+            channel_path=conditioned / "channel_cells.npy",
         ),
     )
     basins = cache.build(
@@ -443,6 +502,8 @@ def prepare_watersheds(config, report):
         lambda out: partition(basins / "watersheds.gpkg", dem, match_report["stations"], out),
     )
     artifacts.update(outlets=str(outlets), watersheds=str(basins), partitions=str(zones))
+    report["closed_lake_acceptance"] = check_exclusion(zones / "zones.tif", lakes / "mask.tif")
+    report["inland_channel_acceptance"] = check_exclusion(zones / "zones.tif", inland / "mask.tif")
     report["routing"] = artifacts
     report["cache_events"].extend(cache.events)
     (cache.root / "latest.json").write_text(

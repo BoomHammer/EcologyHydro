@@ -1,0 +1,201 @@
+# Values are candidate priors, NOT fitted or locally measured parameters.
+# Arrays are [low, central, high]; bounds are scenario choices, not confidence intervals.
+status: literature_informed_and_assumed_sensitivity_only
+date: '2026-10-09'
+sources:
+  FAO_KC: https://www.fao.org/4/X0490E/x0490e0b.htm
+  FAO_ROOT: https://www.fao.org/4/x0490e/x0490e0e.htm
+  JACKSON1996: https://jacksonlab.stanford.edu/sites/g/files/sbiybj20871/files/media/file/oecol96c.pdf
+  YANG2009: https://onlinelibrary.wiley.com/doi/10.1111/j.1654-1103.2009.05566.x
+policy:
+  kc: Annual effective coefficients below are assumptions informed by references; stage Kc is not annual Kc.
+  roots: beta gives d95=10*log(0.05)/log(beta) mm; transferred biome values are not local observations.
+  irrigation: Identical generic cereal parameters for irrigated/rainfed land; no invented irrigation supply.
+  uncertainty: All low/high multipliers and envelopes are analyst assumptions, not literature confidence limits.
+profiles:
+  rice:
+    veg: 1
+    kc: [0.60, 0.85, 1.10]
+    root_mm: [500, 750, 1000]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: Root range for rice transferred; annual Kc assumed including off-season.
+  cereal:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1400, 1800]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: Wheat/maize root envelope and midpoint proxy; crop mix and annual phenology unknown.
+  orchard:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [500, 1000, 2000]
+    root_source: ASSUMED
+    kc_source: FAO_KC
+    evidence: Generic orchard assumption; species and ground cover unknown.
+  shrub_garden:
+    veg: 1
+    kc: [0.40, 0.65, 0.90]
+    root_mm: [300, 750, 1500]
+    root_source: ASSUMED
+    kc_source: ASSUMED
+    evidence: No matched local value found; bounded hypothetical garden profile.
+  greenhouse:
+    veg: 1
+    kc: [0.30, 0.65, 1.00]
+    root_mm: [300, 600, 1000]
+    root_source: ASSUMED
+    kc_source: ASSUMED
+    evidence: Structural placeholder; AWY cannot represent roof interception and irrigation.
+  deciduous_tree:
+    veg: 1
+    kc: [0.50, 0.75, 1.00]
+    beta: 0.966
+    root_source: JACKSON1996
+    kc_source: ASSUMED
+    evidence: Temperate deciduous biome d95 transfer; annual Kc and root envelope assumed.
+  conifer:
+    veg: 1
+    kc: [0.60, 0.80, 1.00]
+    beta: 0.976
+    root_source: JACKSON1996
+    kc_source: FAO_KC
+    evidence: Temperate conifer d95 transfer; FAO well-watered Kc=1 anchor, annual bounds assumed.
+  mixed_tree:
+    veg: 1
+    kc: [0.55, 0.775, 1.00]
+    root_mm: [500, 1050, 1600]
+    root_source: ASSUMED
+    kc_source: ASSUMED
+    evidence: Hypothetical mixed forest interpolation; not a separate measured forest parameter.
+  open_tree:
+    veg: 1
+    kc: [0.35, 0.60, 0.85]
+    root_mm: [500, 1050, 1600]
+    root_source: ASSUMED
+    kc_source: ASSUMED
+    evidence: Cover-related Kc hypothesis; no automatic root shortening from open canopy.
+  shrub:
+    veg: 1
+    kc: [0.35, 0.60, 0.85]
+    beta: 0.964
+    root_source: JACKSON1996
+    kc_source: ASSUMED
+    evidence: Sclerophyllous shrub biome transfer uncertain for local shrubs.
+  alpine_meadow:
+    veg: 1
+    kc: [0.40, 0.65, 0.90]
+    root_mm: [150, 300, 500]
+    root_source: YANG2009
+    kc_source: ASSUMED
+    evidence: 96 percent in top 30 cm supports 300 mm approximate d95; envelope assumed.
+  alpine_steppe:
+    veg: 1
+    kc: [0.30, 0.55, 0.80]
+    fraction_top_300mm: 0.86
+    root_source: YANG2009
+    kc_source: ASSUMED
+    evidence: d95 extrapolated from one cumulative fraction using exponential profile; uncertain.
+  grass:
+    veg: 1
+    kc: [0.35, 0.60, 0.85]
+    beta: 0.943
+    root_source: JACKSON1996
+    kc_source: ASSUMED
+    evidence: Temperate grassland biome transfer; annual Kc assumed.
+  sparse:
+    veg: 1
+    kc: [0.15, 0.30, 0.45]
+    beta: 0.975
+    root_source: JACKSON1996
+    kc_source: ASSUMED
+    evidence: Desert vegetation root proxy; bare/sparse mixed class is not homogeneous vegetation.
+  bare:
+    veg: 0
+    kc: [0.05, 0.15, 0.25]
+    root_mm: [1, 1, 1]
+    root_source: NOT_USED
+    kc_source: ASSUMED
+    evidence: Nonvegetated evaporation hypothesis; substrate subclasses share values without evidence.
+  built:
+    veg: 0
+    kc: [0.10, 0.30, 0.50]
+    root_mm: [1, 1, 1]
+    root_source: NOT_USED
+    kc_source: ASSUMED
+    evidence: Urban evaporation hypothesis; no municipal water demand included.
+  water:
+    veg: 0
+    kc: [0.85, 1.05, 1.25]
+    root_mm: [1, 1, 1]
+    root_source: NOT_USED
+    kc_source: FAO_KC
+    evidence: Shallow-water reference anchor; reservoir depth/heat storage unresolved.
+  wetland:
+    veg: 0
+    kc: [0.60, 0.90, 1.20]
+    root_mm: [1, 1, 1]
+    root_source: NOT_USED
+    kc_source: FAO_KC
+    evidence: Annual envelope assumed from seasonal wetland references; AWY nonvegetated branch.
+  snow:
+    veg: 0
+    kc: [0.02, 0.05, 0.10]
+    root_mm: [1, 1, 1]
+    root_source: NOT_USED
+    kc_source: ASSUMED
+    evidence: Evaporation-only placeholder; no glacier or snow storage/melt dynamics.
+mapping:
+  fine:
+    '1': rice
+    '2': cereal
+    '3': cereal
+    '4': orchard
+    '5': shrub_garden
+    '6': greenhouse
+    '7': bare
+    '8': bare
+    '9': bare
+    '10': bare
+    '11': sparse
+    '12': bare
+    '13': deciduous_tree
+    '14': mixed_tree
+    '15': conifer
+    '16': conifer
+    '17': open_tree
+    '18': alpine_meadow
+    '19': grass
+    '20': alpine_steppe
+    '21': grass
+    '22': shrub
+    '23': shrub
+    '24': deciduous_tree
+    '25': water
+    '26': water
+    '27': wetland
+    '29': snow
+  copernicus:
+    '20': shrub
+    '30': grass
+    '40': cereal
+    '50': built
+    '60': sparse
+    '70': snow
+    '80': water
+    '90': wetland
+    '100': grass
+    '111': conifer
+    '112': mixed_tree
+    '113': conifer
+    '114': deciduous_tree
+    '115': mixed_tree
+    '116': mixed_tree
+    '121': open_tree
+    '122': open_tree
+    '123': open_tree
+    '124': open_tree
+    '125': open_tree
+    '126': open_tree
+    '200': water

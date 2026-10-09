@@ -56,7 +56,16 @@ def channel_cells(mainstem, transform):
     return loop_erased_path(cells), max(gaps, default=0)
 
 
-def condition_dem(dem, mainstem, network, output, burn_depth=5):
+def condition_dem(
+    dem,
+    mainstem,
+    network,
+    output,
+    burn_depth=5,
+    closed_lakes=None,
+    inland_channels=None,
+    tributary_min_area=1000,
+):
     with gdal.Open(str(dem)) as original:
         cells, gap = channel_cells(mainstem, original.GetGeoTransform())
         # One float32 DEM (~179 MB at 250 m); no multiyear raster stacks.
@@ -69,11 +78,42 @@ def condition_dem(dem, mainstem, network, output, burn_depth=5):
                 raise ValueError("Mainstem intersects DEM NoData")
         xs, ys = np.array(cells).T
         elevation = values[ys, xs].copy()
-        values[ys, xs] -= burn_depth
+        from ecologyhydro.channel_network import major_channel_edges
+
+        network_edges, network_report = major_channel_edges(
+            network, cells, original.GetGeoTransform(), original.GetProjection(), tributary_min_area
+        )
+        sources = network_edges[:, :2]
+        if (
+            np.any(sources < 0)
+            or np.any(sources[:, 0] >= original.RasterXSize)
+            or np.any(sources[:, 1] >= original.RasterYSize)
+            or np.any(values[sources[:, 1], sources[:, 0]] == nodata)
+        ):
+            raise ValueError("Mapped major river exceeds valid DEM coverage")
+        values[sources[:, 1], sources[:, 0]] -= burn_depth
         # A single drain cell represents the mapped mouth, not an artificial basin boundary.
         values[ys[-1], xs[-1]] = nodata
         inverse = gdal.InvGeoTransform(original.GetGeoTransform())
         sinks = []
+        lake_pixels = 0
+        inland_pixels = 0
+        for kind, path in (("lake", closed_lakes), ("channel", inland_channels)):
+            if path is None:
+                continue
+            with gdal.Open(str(path)) as mask:
+                if (
+                    mask.GetGeoTransform() != original.GetGeoTransform()
+                    or mask.GetProjection() != original.GetProjection()
+                    or (mask.RasterYSize, mask.RasterXSize) != values.shape
+                ):
+                    raise ValueError("Closed lake mask must align with DEM")
+                terminal = mask.ReadAsArray() == 1
+                if kind == "lake":
+                    lake_pixels = int(terminal.sum())
+                else:
+                    inland_pixels = int(terminal.sum())
+                values[terminal] = nodata
         with ogr.Open(str(network)) as vector:
             layer = vector.GetLayer()
             source_crs = layer.GetSpatialRef()
@@ -97,17 +137,23 @@ def condition_dem(dem, mainstem, network, output, burn_depth=5):
         # Fail instead of imposing an ocean-connected route through a mapped inland sink.
         if any(values[y, x] == nodata for x, y in cells[:-1]):
             raise ValueError("Mapped endorheic outlet overlaps the mainstem")
+        if np.any(values[sources[:, 1], sources[:, 0]] == nodata):
+            raise ValueError("Mapped endorheic drainage overlaps an exorheic major river")
         with gdal.GetDriverByName("GTiff").CreateCopy(
             str(output / "dem.tif"), original, options=OPTIONS
         ) as target:
             target.GetRasterBand(1).WriteArray(values)
         np.save(output / "channel_cells.npy", np.array(cells, dtype=np.int32))
+        np.save(output / "network_edges.npy", network_edges)
     (output / "sinks.json").write_text(json.dumps(sinks, indent=2), encoding="utf-8")
     return {
         "channel_cells": len(cells),
         "channel_burn_m": burn_depth,
         "max_geometry_gap_m": gap,
         "endorheic_sinks": len(sinks),
+        "closed_lake_terminal_pixels": lake_pixels,
+        "inland_channel_terminal_pixels": inland_pixels,
+        "major_network": network_report,
         "uphill_channel_steps_before_conditioning": int((np.diff(elevation) > 0).sum()),
         "maximum_uphill_step_m": float(max(0, np.diff(elevation).max())),
         "method": "5m mainstem burn, mapped terminal drains; D8 channel enforcement after filling",
@@ -115,7 +161,7 @@ def condition_dem(dem, mainstem, network, output, burn_depth=5):
     }
 
 
-def enforce_channel(direction, cells_path, output):
+def enforce_channel(direction, cells_path, output, network_edges=None):
     cells = np.load(cells_path)
     mapping = {
         (1, 0): 0,
@@ -130,7 +176,12 @@ def enforce_channel(direction, cells_path, output):
     with gdal.Open(str(direction)) as source:
         values = source.ReadAsArray()
         changed = 0
-        for (x, y), (next_x, next_y) in zip(cells[:-1], cells[1:], strict=True):
+        edges = (
+            np.load(network_edges)
+            if network_edges is not None
+            else np.column_stack([cells[:-1], cells[1:]])
+        )
+        for x, y, next_x, next_y in edges:
             step = (int(next_x - x), int(next_y - y))
             if step not in mapping:
                 raise ValueError(f"Nonadjacent channel pixels: {step}")
@@ -143,6 +194,6 @@ def enforce_channel(direction, cells_path, output):
             target.GetRasterBand(1).WriteArray(values)
     return {
         "changed_flow_directions": changed,
-        "channel_pixels": len(cells),
-        "method": "loop-erased mainstem D8 path terminates at mapped mouth drain",
+        "channel_pixels": len(edges) + 1,
+        "method": "acyclic major-channel D8 paths anchored on mainstem and mapped mouth drain",
     }

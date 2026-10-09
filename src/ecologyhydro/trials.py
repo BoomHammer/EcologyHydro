@@ -49,10 +49,10 @@ def stop_process(child):
     child.wait()
 
 
-def run_group(config, config_path, index_path, jobs, workers, label):
+def run_group(config, config_path, index_path, jobs, workers, label, batch_root=None):
     if workers not in (1, 2, 4) or workers > len(jobs):
         raise ValueError("M3 concurrency must be 1, 2 or 4 and not exceed the task count")
-    batch_dir = config.paths.cache.parent / "m3" / unique_id(label)
+    batch_dir = (batch_root or config.paths.cache.parent / "m3") / unique_id(label)
     batch_dir.mkdir(parents=True)
     queue = list(enumerate(jobs))
     active, completed = [], []
@@ -90,6 +90,10 @@ def run_group(config, config_path, index_path, jobs, workers, label):
                 ]
                 if job.get("force", False):
                     command.append("--force")
+                if job.get("scenario"):
+                    command.extend(["--scenario", str(job["scenario"])])
+                if job.get("holdout_manifest"):
+                    command.extend(["--holdout-manifest", str(job["holdout_manifest"])])
                 child = subprocess.Popen(command, stdout=stream, stderr=subprocess.STDOUT)
                 active.append(
                     {

@@ -1,0 +1,39 @@
+# User-confirmed crop semantics. This is not yet an executable AWY parameter table.
+version: 2
+confirmed_on: '2026-10-09'
+source: user_confirmation
+status: crop_system_confirmed_monthly_parameterization_hypothesis
+systems:
+  winter_wheat_summer_maize:
+    description: Winter wheat followed by summer maize; two sequential crops per year.
+    crops: [winter_wheat, summer_maize]
+    crops_per_year: 2
+    calendar_basis: natural_year
+    calendar_note: Include overwintering wheat from the previous autumn and newly sown wheat in the current autumn.
+    monthly_kc: [0.40, 0.40, 0.65, 1.05, 1.15, 0.60, 0.85, 1.20, 0.90, 0.45, 0.60, 0.40]
+    monthly_kc_status: Assumed monthly interpolation from FAO stage anchors; not local measurements.
+    planting_harvest_dates:
+      winter_wheat: October sowing; early/mid June harvest in following year.
+      summer_maize: June sowing; September/early October harvest.
+    calendar_status: North China Plain literature transferred uniformly as a scenario, not verified at every pixel.
+    kc_sensitivity_factors: {low: 0.85, central: 1.0, high: 1.15}
+    annual_kc_method: sum(monthly_Kc * monthly_ET0) / sum(monthly_ET0)
+    annual_root_depth_mm: 1400
+    root_depth_note: Retain previous cereal effective-depth proxy to isolate Kc response; not the sum of roots or a resolved seasonal root model.
+    irrigation_supply: unknown_not_zero
+mapping:
+  fine:
+    '2': winter_wheat_summer_maize
+scope:
+  fine_code_2: Apply the rotation to all current irrigated-cropland pixels as a temporary simplification of the user-confirmed majority.
+  fine_code_3: Rainfed cropland remains unspecified; do not infer the same rotation.
+  copernicus_code_40: Mixed cropland; do not infer all pixels have the irrigated rotation or alter the map.
+future_subdivision:
+  policy: Add new class-to-system mappings without overwriting historical legends or parameter versions.
+historical_results:
+  candidate_file: config/biophysical_candidates.yaml
+  note: Existing sensitivity results used the earlier generic cereal prior, not a seasonally parameterized rotation.
+references:
+  kc_stage_anchors: https://www.fao.org/4/X0490E/x0490e0b.htm
+  rotation_calendar: https://www.sciencedirect.com/science/article/pii/S0926669006001580
+  regional_field_study: https://pmc.ncbi.nlm.nih.gov/articles/PMC12066458/

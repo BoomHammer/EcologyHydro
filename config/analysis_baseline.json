@@ -1,0 +1,6 @@
+{
+  "index": "project/repairs/soil_routing/m2_index.json",
+  "summary": "project/repairs/soil_routing/summary.json",
+  "status": "repaired_fixed_parameter_baseline_not_calibrated",
+  "policy": "Explicit baseline selection; never choose a sensitivity winner automatically"
+}

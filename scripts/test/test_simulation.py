@@ -51,7 +51,7 @@ def test_units_and_complete_valid_area(tmp_path):
     assert checks["maximum_water_balance_error_mm"] == 0
 
 
-@pytest.mark.parametrize("value", [NODATA, -2, np.nan])
+@pytest.mark.parametrize("value", [NODATA, -2, -0.001, np.nan])
 def test_missing_or_invalid_yield_is_not_partial_success(tmp_path, value):
     zones = zone_raster(tmp_path / "zones.tif", [[1, 1], [0, 0]])
     wyield = raster(tmp_path / "yield.tif", [[100, value], [NODATA, NODATA]])
@@ -66,6 +66,16 @@ def test_water_balance_failure(tmp_path):
     aet = raster(tmp_path / "aet.tif", [[800, 800], [NODATA, NODATA]])
     with pytest.raises(ValueError, match="water-balance"):
         zone_volumes(wyield, zones, rain, aet)
+
+
+def test_float32_negative_roundoff_is_accounted_without_losing_area(tmp_path):
+    zones = zone_raster(tmp_path / "zones.tif", [[1, 1], [0, 0]])
+    wyield = raster(tmp_path / "yield.tif", [[100, -0.0001], [NODATA, NODATA]])
+    rows, checks = zone_volumes(wyield, zones)
+    assert rows[0]["volume_m3"] == pytest.approx(6250)
+    assert rows[0]["valid_area_km2"] == rows[0]["area_km2"]
+    assert checks["negative_roundoff_cells"] == 1
+    assert checks["negative_roundoff_correction_m3"] == pytest.approx(0.00625)
 
 
 def test_nested_station_totals_and_duplicate_mapping(tmp_path):

@@ -8,14 +8,25 @@ soil_database: data/Soil/HWSD2.mdb
 soil_crs_assumption: EPSG:4326
 soil_depth_proxy_mm: {'1': 1500, '2': 750, '3': 300, '4': 50}
 soil_depth_status: provisional_class_midpoints_capped_at_200cm
+soil_capacity_method: hwsd2_layer_integrated_texture_coarse_mineralogy_salinity
 climate_directory: data/Climate/Data_forcing_01mo_010deg
 pet_directory: data/Climate/TerraClimate_PET
+# Keep the existing CMFD baseline explicit; unverified region totals must not select inputs.
+precipitation_baseline: prec
 landcover:
   copernicus: data/LCLU/Copernicus_Landcover_100m.tif
   fine: data/LCLU/vegetation_model_20261007_154221plusIce.tif
 class_tables:
   copernicus: data/LCLU/Copernicus_CGLS_LC100_Mapping.csv
   fine: data/LCLU/vegetation_model_20261007_154221.csv
+lake_overlay:
+  vector: data/Hydrology/黄河流域湖泊.shp
+  water_codes: {fine: 25, copernicus: 80}
+# Review triggers, not target areas or tolerances for forced boundary adjustment.
+reference_review:
+  area_relative_difference: 0.15
+  precipitation_volume_relative_difference: 0.30
+  precipitation_depth_relative_difference: 0.25
 river_network: data/Hydrology/HydroRIVERS_v10_as_shp/HydroRIVERS_v10_as_yellowriver.shp
 stations: data/Hydrology/测站控制面积.csv
 boundary: data/Hydrology/黄河流域.shp
@@ -23,3 +34,10 @@ boundary: data/Hydrology/黄河流域.shp
 station_review_distance_m: 10000
 # Routing outlet candidates must intersect the verified mainstem, within this radius.
 outlet_search_radius_m: 2000
+outlet_method: nearest_enforced_mainstem_pixel
+tributary_min_upstream_km2: 1000
+closed_lakes:
+  - name: Qinghai_Lake
+    seed_lonlat: [100.15, 36.85]
+    search_bounds_lonlat: [99.4, 36.4, 101.0, 37.4]
+    evidence: https://www.fao.org/4/ag186e/AG186E03.htm
