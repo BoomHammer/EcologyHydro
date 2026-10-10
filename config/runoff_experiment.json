@@ -1,10 +1,36 @@
 {
-  "name": "closed_routing_and_training_stability_diagnostics",
-  "status": "training_sensitivity_reduced_joint_stability_gate_not_passed",
-  "training_years": [2019, 2020, 2021, 2022],
-  "test_year": 2023,
-  "test_year_status": "reused_test_year_not_new_independent_validation",
-  "report": "docs/STABILITY_DIAGNOSIS.md",
+  "name": "landcover_comparison_and_scenario_research",
+  "status": "three_product_cross_parameter_trial_complete",
+  "updated_date": "2026-10-11",
+  "work_plan": "DEVELOPMENT.md",
+  "active_config": "config/landcover_comparison.yaml",
+  "active_report": "docs/LANDCOVER_CROSS_COMPARISON.md",
+  "active_directory": "experiments/landcover_cross/20261010T182322_304737Z",
+  "active_summary": "experiments/landcover_cross/20261010T182322_304737Z/summary.json",
+  "active_predictions": "experiments/landcover_cross/20261010T182322_304737Z/predictions.csv",
+  "active_metrics": "experiments/landcover_cross/20261010T182322_304737Z/metrics.csv",
+  "active_validation_matrix": "experiments/landcover_cross/20261010T182322_304737Z/validation_matrix.csv",
+  "initial_trial_rejected": "experiments/landcover_cross/20261010T181430_710893Z/TRIAL_STATUS.md",
+  "products": ["fine", "copernicus", "worldcover"],
+  "cross_parameter_pairs": 9,
+  "warmup_years": [2011, 2012],
+  "bridge_years": [2018],
+  "training_window": [2013, 2021],
+  "training_years": [2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021],
+  "validation_years": [2022, 2023, 2024],
+  "first_stage_training_years": [2013, 2014, 2015, 2016, 2017],
+  "second_stage_training_years": [2019, 2020, 2021],
+  "validation_interpretation": "2022-2024 excluded from current fitting; 2022 and 2023 historically inspected, 2024 newly added",
+  "training_policy": "union of both calibration stages; freeze each product parameters for all nine pairs",
+  "missing_policy": "No imputation; warmup and bridge unscored; 2014 missing upstream accounts propagate downstream",
+  "test_year": 2024,
+  "test_year_status": "newly_added_current_protocol_validation",
+  "report": "docs/LANDCOVER_CROSS_COMPARISON.md",
+  "historical_data_audit_report": "docs/DATA_USAGE_AND_RESEARCH_ASSESSMENT.md",
+  "monthly_report": "docs/MONTHLY_PILOT_RESULTS.md",
+  "research_metrics": "project/diagnostics/data_usage_review/station_research_metrics.csv",
+  "data_inventory": "project/diagnostics/data_usage_review/data_inventory.csv",
+  "pet_provenance_audit": "project/diagnostics/data_usage_review/pet_2013_2018.csv",
   "diagnostic_experiments": [
     {
       "directory": "project/calibration/regional_water_v1",
@@ -35,19 +61,63 @@
       "directory": "project/calibration/stability_v1",
       "summary": "project/calibration/stability_v1/full_pixel_cv/summary.json",
       "scope": "fixed_closed_D8_domain_three_vs_four_Z_and_nested_training_subset_mean_development_only"
+    },
+    {
+      "directory": "project/calibration/long_record_v1",
+      "summary": "project/calibration/long_record_v1/summary.json",
+      "scope": "physical_macro3_and_seven_gauge_proxies_fixed_early_and_expanding_past_training_conditional_validation"
+    },
+    {
+      "directory": "project/calibration/requested_years_v1",
+      "summary": "project/calibration/requested_years_v1/summary.json",
+      "scope": "user_requested_2018_past_account_rough_scenarios_and_2023_stationwise_reused_evaluation"
+    },
+    {
+      "directory": "project/calibration/monthly_pilot_v1",
+      "summary": "project/calibration/monthly_pilot_v1/final_assessment.json",
+      "scope": "Guide_monthly_bucket_fixed_and_rolling_validation_delete_year_stability_unchanged_downstream_increment_diagnosis"
+    },
+    {
+      "directory": "project/calibration/monthly_constraints_v1",
+      "summary": "project/calibration/monthly_constraints_v1/summary.json",
+      "scope": "early_TerraClimate_AET_SWE_proxy_constrained_parameter_screening",
+      "status": "deprecated_invalid_delete_year_stability_evidence",
+      "reason": "Full-training optimum injected into every deletion candidate set; sparse interior sampling does not resolve boundary feasibility",
+      "use_for_research_acceptance": false,
+      "superseding_review": "docs/DATA_USAGE_AND_RESEARCH_ASSESSMENT.md",
+      "source_archive": "project/archives/cleanup_monthly_constraints_20261010.zip"
     }
   ],
-  "development_selection": "project/calibration/stability_v1/full_pixel_cv/summary.json",
-  "latest_finding": "Subset averaging reduces training-year sensitivity; Copernicus worst-year degradation prevents joint acceptance; no new 2023 predictions",
+  "development_selection": null,
+  "latest_comparison": "project/calibration/monthly_pilot_v1/validation_metrics.csv",
+  "monthly_pilot_result": "project/calibration/monthly_pilot_v1/final_assessment.json",
+  "monthly_pilot_protocol": "project/calibration/monthly_pilot_v1/protocol.json",
+  "requested_years_result": "project/calibration/requested_years_v1/summary.json",
+  "requested_years_protocol": "project/calibration/requested_years_v1/protocol.json",
+  "latest_finding": "Nine AWY pairs completed for 2011-2024. Validation relative RMSE rows by parameter source (fine, copernicus, worldcover), columns by landcover in the same order: [15.626,23.314,27.680], [15.605,13.734,16.416], [15.446,11.970,13.540]. Rankings depend on parameter source; no universal fine-landcover superiority established. Maximum quadrature error is 0.546% of observed runoff.",
+  "process_diagnostics": {
+    "error_origin": "project/diagnostics/error_origin_v1/summary.json",
+    "headwater_balance": "project/diagnostics/headwater_balance_v1/summary.json",
+    "precipitation_sensitivity": "project/diagnostics/headwater_balance_v1/precipitation_sensitivity.json",
+    "new_parameters_fitted": false,
+    "observed_upstream_boundary_is_not_full_basin_validation": true
+  },
   "domain_candidate": "project/repairs/closed_routing_v3/zones.tif",
   "routing_diagnostic": "project/repairs/closed_routing_v3/summary.json",
-  "stability_protocol": "project/calibration/stability_v1/protocol.json",
-  "working_reference": "four_region on corrected closed D8 domain; subset mean retained as a sensitivity diagnostic",
+  "stability_protocol": "project/calibration/long_record_v1/protocol.json",
+  "working_reference": "Current reach7 AWY with three products and nine fixed-parameter combinations; monthly pilot and macro3/pooled7 results remain historical comparators",
+  "boundary_policy": "User confirms no official polygons will be supplied; use explicit gauge catchment proxies, not official water-resource polygons",
+  "long_record_audit": "project/diagnostics/long_record_v2/summary.json",
+  "region_maps": {
+    "macro3": "project/diagnostics/long_record_v2/macro3.tif",
+    "reach7": "project/diagnostics/long_record_v2/reach7.tif"
+  },
   "storage_diagnostic": "project/diagnostics/storage_change_v1/summary.json",
   "spatial_audit": "project/diagnostics/dryland_connectivity_v2/summary.json",
   "bare_evaporation_sensitivity": "project/diagnostics/bare_evaporation_v1/protocol.json",
-  "evaluation_stations": ["贵得", "兰州", "头道拐", "龙门", "三门峡", "花园口"],
-  "water_accounts": ["legacy", "sector_2022"],
+  "evaluation_stations": ["贵得", "兰州", "头道拐", "龙门", "三门峡", "花园口", "利津"],
+  "station_scope": "Seven conditional endpoints; common six and Lijin reported separately; Lijin is not the river mouth",
+  "water_accounts": ["updated_2011_2024_surface_consumption_and_storage"],
   "production_parameter_selected": false,
   "frozen_baseline": {
     "training_summary": "project/calibration/major_bias/summary.json",
@@ -57,6 +127,8 @@
     "report": "docs/MAJOR_BIAS_CALIBRATION.md"
   },
   "target": "observed_regulated_runoff",
-  "next_priority": "extend_continuous_years_and_forward_time_validation_check_climate_input_and_storage_ET_consistency",
+  "next_priority": "consolidate_paired_landcover_results_then_landcover_change_and_CMIP6_scenarios",
+  "scenario_status": "planned_not_run",
+  "data_request_policy": "Use existing and publicly obtainable inputs first; request additional data only for a specific material research question with alternatives and cost explained",
   "policy": "Preserve frozen baseline; enforce documented closed surface domain; no selection on reused 2023, post-hoc gate relaxation, or landcover winner declaration"
 }

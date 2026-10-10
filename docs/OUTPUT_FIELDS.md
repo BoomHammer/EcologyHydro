@@ -1,5 +1,10 @@
 # 测站输出口径与字段字典
 
+2026-10-11：当前九组合 `predictions.csv`／`metrics.csv` 的完整字段定义见
+[三产品交叉实验第 4 节](LANDCOVER_CROSS_COMPARISON.md#4-径流口径与输出字段)。
+原单位 RMSE 为亿 m³；单站单年 RMSE 是绝对误差，逐站跨年和逐年全站 RMSE 分开汇总。
+预热、桥接和缺水账站年不计分；十一站产水与七站管理径流分表，不能混用。
+
 适用于官方 AWY 运行的 `stations.csv`。历史字段名保留，当前实验见 `config/runoff_experiment.json`。
 
 | 字段 | 定义与单位 |
@@ -43,3 +48,35 @@
 - `climate_sensitivity_*.csv` 的 `factor=0.95/1.05` 是固定参数下的假设性气象扰动。响应除以实测做尺度归一化，不是气候数据实测不确定度，也不意味着对扰动情景有观测真值。
 
 小负值舍入修正见 [预处理](M2_PREPROCESSING.md)。真实负值、缺失及面积丢失仍须报错。
+
+## 扩展年份时间验证
+
+`long_record_v1/stations_*.csv` 单独定义七站条件预测，水量单位均为亿 m³：
+
+| 字段 | 含义 |
+| --- | --- |
+| `model/account` | `macro3/reach7/pooled7` 和两版耗水账户 |
+| `phase` | `fixed_early` 固定 2013—2017 参数，`rolling` 扩展过去训练，`development_fit` 全开发资料拟合 |
+| `fit/training_years` | 参数记录键与实际训练年份；不包含管理账户缺失的 2018 |
+| `eligible` | 实测和累计修正均完整才可率定／评价，不单以是否有实测判定 |
+| `predicted` | 累计 AWY 减累计地表耗水、水库蓄变及头道拐以下一次 L；缺失账户输出空值 |
+| `sampled_prediction` | 确定性分层样点的近似预测，用于核查计算近似 |
+| `observed/known_adjustment` | 实测年径流／累计地表耗水与水库蓄变之和，后者不含 L |
+| `official_full_pixel` | 是否用官方 AWY 内核全像元核算，不表示执行了完整 `execute` 工作空间 |
+| `validation` | 仅真正的后来年份验证行设 True；固定早期方案在训练年上的回算不是验证 |
+
+`comparison.csv` 分 `seven_conditional`、`common_six`、`lijin_conditional`，六站是同一七站拟合的评分子集。相对 RMSE 与 MAPE 计算沿用上文，不能把嵌套七站当成独立重复试验。
+
+`parameter_trajectories.csv` 的 `active_bound=-1/0/1` 表示下界／未贴界／上界；`past_parameter_ranges.csv` 只比较四个验证用训练窗口。`identifiability.csv` 是数据残差归一化雅可比的局部奇异值诊断，不包含约束项，不是参数置信区间。
+
+`rainfall_comparison.csv` 的 `proxy_difference_pct` 为代理区格点 P 除以统计区折算 P 再减一的百分数，`same_boundary=false` 明确双方边界不同。`early_late_climate_runoff.csv` 的气候为局地区间平均，径流为下游站累计观测，不能直接相除作为径流弹性。`reach_errors.csv` 为相邻站预测差减观测差，其水量误差不以可能接近零或为负的区间增量作相对分母。
+
+## 主要过程诊断
+
+`error_origin_v1/` 的 `cumulative_error` 为模拟减实测，`incremental_error` 为相邻站累计误差之差；`known_guide/known_lanzhou` 使用当年实测上游边界，仅报告兰州以下五站。不能作为独立全流域精度。
+
+`headwater_balance_v1/monthly_balance.csv` 的区域 1/2 分别为贵得以上、贵得—兰州，均为非重叠区。所有水量单位为亿 m³：`ppt/pet/aet/q` 为月通量，`soil/swe` 为月末状态；`delta_soil/delta_snow` 是相邻月末差值，正值为蓄水增加。`delta_runoff_carry` 是提供方 0.5 月间径流滞蓄假设下的 Q 状态差诊断，不是观测地下水蓄变。`closure_with_carry` 保留全部未闭合量，月残差不强制归零。
+
+`annual_cumulative_balance.csv` 才累计为贵得和兰州，`provider_conditional_q` 为外部模型 Q 减同样累计管理账户，2018 为空。`process_decomposition.csv` 中 `aet_effect_on_q` 为 AWY AET 减外部 AET；加上 `soil_snow_effect_on_q`、`carry_effect_on_q`、`closure_effect_on_q` 等于外部模型与 AWY 的径流差。这是模型间差异分解，不是真实误差的已识别因果份额。
+
+`precipitation_sensitivity.csv` 使用统计区折算降水和测站代理区的不完全对应，固定参数近似计算 `rainfall_yield_change`，加到原全像元预测。`rainfall_and_external_storage` 同时拼接外部土壤／雪水释放，仅作事后敏感性情景，不能用于正式情景预测。

@@ -14,6 +14,8 @@
 
 基础配方保留 CMFD prec 工程基线；当前 TerraClimate V1.1 成对气候由实验情景覆盖，未改写基线。
 
+最新时间验证另补齐 `project/repairs/long_climate_v1/` 的 2013—2018 P/PET，2019—2022 复用提供方 V1.1。新 `project/diagnostics/long_record_v2/macro3.tif`、`reach7.tif` 由已修正的 `closed_routing_v3/zones.tif` 合并生成，不改写旧 M2 索引。三区按头道拐／花园口合并；七区对应贵得、兰州、头道拐、龙门、三门峡、花园口、利津七个出口。0 为区外，这些是测站汇水代理而非官方二级区，详见 [长序列验证](LONG_RECORD_VALIDATION.md)。
+
 ## 网格及输入
 
 - WGS84 Albers 等积投影，中央经线 105°、标准纬线 25°/47°，250 m，当前 8901 × 5012 像元，每像元 0.0625 km²。

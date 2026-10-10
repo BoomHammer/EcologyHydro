@@ -10,8 +10,8 @@ paths:
   outputs: experiments
   logs: project/logs
 study:
-  # 用户已确认：目标年 Y 用前四年 Y-4 至 Y-1 校准，Y 年独立验证。
-  # 当前仅有 2019—2023，故当前验证目标为 2023；滚动执行器尚未实现。
+  # 当前三产品交叉实验详见 config/landcover_comparison.yaml。
+  # 2011–2012 预热、2018 桥接，均不率定也不评估；两段率定年合并。
   # 测站 X/Y 为 CGCS2000 经度/纬度；下方 projected_crs 是待选的模型米制投影。
   # 当前使用观测 CSV 中的站名作为项目标识，非另行编造的官方站号。
   # 率定/评价按站点—年份筛选有效观测；缺失不补零，零/负径流标为异常待核查。
@@ -27,8 +27,8 @@ study:
     - 花园口
     - 高村
     - 利津
-  calibration_years: [2019, 2020, 2021, 2022]
-  validation_years: [2023]
+  calibration_years: [2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021]
+  validation_years: [2022, 2023, 2024]
   projected_crs: null
   resolution_m: null
 inputs:

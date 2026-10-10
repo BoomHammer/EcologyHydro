@@ -1,0 +1,82 @@
+# Current, prospective execution protocol. Paths are relative to the project root.
+schema_version: 1
+years:
+  warmup: [2011, 2012]
+  calibration_stage1: [2013, 2014, 2015, 2016, 2017]
+  bridge: [2018]
+  calibration_stage2: [2019, 2020, 2021]
+  validation: [2022, 2023, 2024]
+model: reach7
+paths:
+  output_root: experiments/landcover_cross
+  prepared: project/comparison_2011_2024
+  grid_index: project/repairs/soil_routing/m2_index.json
+  zones: project/repairs/closed_routing_v3/zones.tif
+  pawc: project/cache/m2/aligned/pawc/0dc28d6f52acc3953d75ba39/data.tif
+  soil: project/cache/m2/aligned/root_depth/c69c455360df06171587485e/data.tif
+  lake_mask: project/cache/m2/landcover/lake_mask/f76f72ce57d81373bc06f87d/mask.tif
+  base_tables: project/calibration/regional_water_v1/base_tables.json
+  crop_systems: config/crop_systems.yaml
+hydrology:
+  observations: data/Hydrology/实测年径流量2011-2024.csv
+  consumption: data/Hydrology/地表水耗水2011-2024.csv
+  storage: data/Hydrology/大中型水库年蓄水变化量2011-2024.csv
+  # These two are inventoried, not silently added to surface-water accounts.
+  groundwater: data/Hydrology/地下水耗水2011-2024.csv
+  precipitation_reference: data/Hydrology/降水量2011-2024.csv
+climate:
+  version: V1.1
+  variables: [ppt, pet]
+  url: https://tds-proxy.nkn.uidaho.edu/thredds/ncss/grid/agg_terraclimate_{variable}_1950_CurrentYear_GLOBE.nc
+  bounds: {north: 42.5, south: 31.5, west: 95, east: 120}
+  raw_template: project/comparison_2011_2024/climate/terraclimate_{variable}_{year}.nc
+  aligned_template: project/comparison_2011_2024/climate/{variable}_{year}_aligned.tif
+  reuse:
+    - years: [2013, 2014, 2015, 2016, 2017, 2018]
+      raw_template: project/repairs/long_climate_v1/terraclimate_{variable}_{year}.nc
+    - years: [2019, 2020, 2021, 2022]
+      raw_template: project/repairs/climate_reference_full/provider/terraclimate_current_{variable}_{year}.nc
+    - years: [2023]
+      raw_template: project/repairs/climate_reference_full_holdout/provider/terraclimate_current_{variable}_{year}.nc
+products:
+  fine:
+    source: data/LCLU/vegetation_model_20261007_154221plusIce.tif
+    classes: data/LCLU/vegetation_model_20261007_154221.csv
+    aligned: project/cache/m2/landcover/lake_overlay/fine/eea3079eff9d56cb036129e3/data.tif
+    table_product: fine
+    table_year: '2019'
+    rotation_codes: [2]
+  copernicus:
+    source: data/LCLU/Copernicus_Landcover_100m.tif
+    classes: data/LCLU/Copernicus_CGLS_LC100_Mapping.csv
+    aligned: project/cache/m2/landcover/lake_overlay/copernicus/60ac81a0bf6aabbdac14fb87/data.tif
+    table_product: copernicus
+    table_year: '2019'
+    rotation_codes: []
+  worldcover:
+    source: data/LCLU/ESA_WorldCover_v200.tif
+    classes: data/LCLU/ESA_WorldCover_10m_v200_Mapping.csv
+    aligned: project/comparison_2011_2024/worldcover/data.tif
+    native_aligned: project/comparison_2011_2024/worldcover/native_aligned.tif
+    water_code: 80
+    table_product: copernicus
+    table_year: '2019'
+    # Same broad-class priors as Copernicus; forest uses its mixed-tree proxy.
+    # Mangroves deliberately unmapped: fail if encountered in the study basin.
+    code_transfer: {'10': 116, '20': 20, '30': 30, '40': 40, '50': 50, '60': 60, '70': 70, '80': 80, '90': 90, '100': 100}
+    rotation_codes: []
+evaluation:
+  managed_stations: [贵得, 兰州, 头道拐, 龙门, 三门峡, 花园口, 利津]
+  all_stations: [唐乃亥, 贵得, 兰州, 下河沿, 石嘴山, 头道拐, 龙门, 三门峡, 花园口, 高村, 利津]
+  # Initial 8192 trial exceeded the 1% quadrature tolerance; refine all products equally.
+  sampling_budget_per_zone: 32768
+  quadrature_max_fraction_observed: 0.01
+resources:
+  max_workers: 2
+  threads_per_worker: 1
+  memory_budget_gb: 24
+  timeout_hours: 12
+references:
+  - https://www.climatologylab.org/terraclimate.html
+  - https://esa-worldcover.org/en/data-access
+  - https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/annual_water_yield.html
