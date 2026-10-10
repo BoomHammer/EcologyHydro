@@ -1,14 +1,54 @@
 {
-  "name": "major_bias_two_parameter_calibration",
-  "status": "independent_test_complete_accuracy_not_accepted",
+  "name": "connected_domain_storage_and_rainfall_diagnostics",
+  "status": "conditional_process_diagnostics_complete_accuracy_not_accepted",
   "training_years": [2019, 2020, 2021, 2022],
   "test_year": 2023,
-  "training_summary": "project/calibration/major_bias/summary.json",
-  "parameters": "project/calibration/major_bias/parameters.json",
-  "frozen_training": "project/calibration/major_bias/holdout_2023/frozen_training.json",
-  "test_summary": "project/calibration/major_bias/holdout_2023/summary.json",
-  "report": "docs/MAJOR_BIAS_CALIBRATION.md",
+  "test_year_status": "reused_test_year_not_new_independent_validation",
+  "report": "docs/CONNECTED_STORAGE_DIAGNOSIS.md",
+  "diagnostic_experiments": [
+    {
+      "directory": "project/calibration/regional_water_v1",
+      "summary": "project/calibration/regional_water_v1/summary.json",
+      "scope": "uniform_vs_three_region_z_with_and_without_known_management"
+    },
+    {
+      "directory": "project/calibration/regional_water_v2",
+      "summary": "project/calibration/regional_water_v2/summary.json",
+      "scope": "four_region_followup_hypothesis_after_v1_residual_review"
+    },
+    {
+      "directory": "project/calibration/reach_loss_v1",
+      "summary": "project/calibration/reach_loss_v1/summary.json",
+      "scope": "four_z_plus_kc_plus_one_unidentified_constant_Lanzhou_Toudaoguai_net_loss"
+    },
+    {
+      "directory": "project/calibration/connected_water_v1",
+      "summary": "project/calibration/connected_water_v1/summary.json",
+      "scope": "documented_Gonghe_inland_exclusion_and_fixed_soil_snow_storage_diagnostic"
+    },
+    {
+      "directory": "project/calibration/reference_rainfall_v1",
+      "summary": "project/calibration/reference_rainfall_v1/summary.json",
+      "scope": "conditional_regional_observed_rainfall_reconstruction_no_runoff_fit_of_factors"
+    }
+  ],
+  "development_selection": "project/calibration/connected_water_v1/development_selection.json",
+  "latest_finding": "No new candidate improves development LOYO; 2023 storage-case improvement not accepted",
+  "domain_candidate": "project/diagnostics/gonghe_connectivity_v1/zones.tif",
+  "storage_diagnostic": "project/diagnostics/storage_change_v1/summary.json",
+  "spatial_audit": "project/diagnostics/dryland_connectivity_v2/summary.json",
+  "bare_evaporation_sensitivity": "project/diagnostics/bare_evaporation_v1/protocol.json",
+  "evaluation_stations": ["贵得", "兰州", "头道拐", "龙门", "三门峡", "花园口"],
+  "water_accounts": ["legacy", "sector_2022"],
+  "production_parameter_selected": false,
+  "frozen_baseline": {
+    "training_summary": "project/calibration/major_bias/summary.json",
+    "parameters": "project/calibration/major_bias/parameters.json",
+    "frozen_training": "project/calibration/major_bias/holdout_2023/frozen_training.json",
+    "test_summary": "project/calibration/major_bias/holdout_2023/summary.json",
+    "report": "docs/MAJOR_BIAS_CALIBRATION.md"
+  },
   "target": "observed_regulated_runoff",
-  "next_priority": "explicit_water_use_and_reservoir_storage_in_runoff_operator",
-  "policy": "Preserve this frozen test; no automatic retuning or landcover winner declaration"
+  "next_priority": "check_2022_2023_storage_ET_consistency_and_preserve_closed_basins_in_full_DEM_routing",
+  "policy": "Preserve frozen baseline; no version selection on reused 2023 or landcover winner declaration"
 }
