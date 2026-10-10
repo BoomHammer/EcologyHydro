@@ -1,10 +1,10 @@
 {
-  "name": "connected_domain_storage_and_rainfall_diagnostics",
-  "status": "conditional_process_diagnostics_complete_accuracy_not_accepted",
+  "name": "closed_routing_and_training_stability_diagnostics",
+  "status": "training_sensitivity_reduced_joint_stability_gate_not_passed",
   "training_years": [2019, 2020, 2021, 2022],
   "test_year": 2023,
   "test_year_status": "reused_test_year_not_new_independent_validation",
-  "report": "docs/CONNECTED_STORAGE_DIAGNOSIS.md",
+  "report": "docs/STABILITY_DIAGNOSIS.md",
   "diagnostic_experiments": [
     {
       "directory": "project/calibration/regional_water_v1",
@@ -30,11 +30,19 @@
       "directory": "project/calibration/reference_rainfall_v1",
       "summary": "project/calibration/reference_rainfall_v1/summary.json",
       "scope": "conditional_regional_observed_rainfall_reconstruction_no_runoff_fit_of_factors"
+    },
+    {
+      "directory": "project/calibration/stability_v1",
+      "summary": "project/calibration/stability_v1/full_pixel_cv/summary.json",
+      "scope": "fixed_closed_D8_domain_three_vs_four_Z_and_nested_training_subset_mean_development_only"
     }
   ],
-  "development_selection": "project/calibration/connected_water_v1/development_selection.json",
-  "latest_finding": "No new candidate improves development LOYO; 2023 storage-case improvement not accepted",
-  "domain_candidate": "project/diagnostics/gonghe_connectivity_v1/zones.tif",
+  "development_selection": "project/calibration/stability_v1/full_pixel_cv/summary.json",
+  "latest_finding": "Subset averaging reduces training-year sensitivity; Copernicus worst-year degradation prevents joint acceptance; no new 2023 predictions",
+  "domain_candidate": "project/repairs/closed_routing_v3/zones.tif",
+  "routing_diagnostic": "project/repairs/closed_routing_v3/summary.json",
+  "stability_protocol": "project/calibration/stability_v1/protocol.json",
+  "working_reference": "four_region on corrected closed D8 domain; subset mean retained as a sensitivity diagnostic",
   "storage_diagnostic": "project/diagnostics/storage_change_v1/summary.json",
   "spatial_audit": "project/diagnostics/dryland_connectivity_v2/summary.json",
   "bare_evaporation_sensitivity": "project/diagnostics/bare_evaporation_v1/protocol.json",
@@ -49,6 +57,6 @@
     "report": "docs/MAJOR_BIAS_CALIBRATION.md"
   },
   "target": "observed_regulated_runoff",
-  "next_priority": "check_2022_2023_storage_ET_consistency_and_preserve_closed_basins_in_full_DEM_routing",
-  "policy": "Preserve frozen baseline; no version selection on reused 2023 or landcover winner declaration"
+  "next_priority": "extend_continuous_years_and_forward_time_validation_check_climate_input_and_storage_ET_consistency",
+  "policy": "Preserve frozen baseline; enforce documented closed surface domain; no selection on reused 2023, post-hoc gate relaxation, or landcover winner declaration"
 }

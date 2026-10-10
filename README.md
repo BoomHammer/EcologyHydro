@@ -2,9 +2,9 @@
 
 基于 InVEST Annual Water Yield（AWY），使用精细分类和 Copernicus 两套土地覆盖，模拟黄河干流 11 个测站的年水量，为后续 CMIP6 和土地覆盖变化实验提供基础。
 
-**已完成共和内流盆地、跨年蓄变和区域降水重建的进一步检验，精度尚未验收。** 当前实验由 [runoff_experiment.json](config/runoff_experiment.json) 定位。最新见 [连通性与跨年蓄变诊断](docs/CONNECTED_STORAGE_DIAGNOSIS.md)，前轮 [内流区与荒漠诊断](docs/DRYLAND_CONNECTIVITY_DIAGNOSIS.md) 及 [分区与水量诊断](docs/REGIONAL_WATER_DIAGNOSIS.md) 保留。
+**当前重心为跨年稳定性，已完成实际闭流汇流约束和训练子集组合对照。** 当前实验由 [runoff_experiment.json](config/runoff_experiment.json) 定位，最新见 [稳定性诊断](docs/STABILITY_DIAGNOSIS.md)。切断共和闭流面向外的 D8 连接后重新划分 11 站汇水区；六站组合预测的删年敏感性约降低 12%—14%，但 Copernicus 最差年份略有恶化，联合稳定性门槛未通过，未更新生产参数。本轮没有生成新的 2023 预测。
 
-本轮发现共和内流盆地被通用填洼误连到黄河的证据。排除候选范围后，精细六站留一年／2023 MAPE 为 10.15%／22.33%；新增外部土壤／雪水蓄变后为 13.32%／6.65%。**复用年大幅改善没有通过跨年稳定性检查，不能将 6.65% 宣称为正式精度。** 开发年排序仍支持上一轮候选，未替换生产参数。
+前轮 [连通性与跨年蓄变诊断](docs/CONNECTED_STORAGE_DIAGNOSIS.md) 发现共和内流盆地被通用填洼误连到黄河的证据。仅排除候选范围后，精细六站留一年／2023 MAPE 为 10.15%／22.33%；新增外部土壤／雪水蓄变后为 13.32%／6.65%。**复用年大幅改善没有通过跨年稳定性检查，不能将 6.65% 宣称为正式精度。** 旧开发年误差排序不再作为恢复错误连通范围的理由。
 
 精细地类在相同六站上，统一 Z 无管理的训练／2023 MAPE 为 15.85%／43.45%；三分区加管理降至 8.63%／24.16%。四分区进一步改善开发年留一年误差至 10.23%，但 2023 为 24.38%，未继续改善。新 2023 结果均为复用测试年；管理账户仍是条件情景，尚未覆盖全部 11 站。
 
@@ -29,6 +29,7 @@
 - [分区与水量诊断](docs/REGIONAL_WATER_DIAGNOSIS.md)：最新对照、四分区补充实验及未闭合水量。
 - [内流区与荒漠诊断](docs/DRYLAND_CONNECTIVITY_DIAGNOSIS.md)：空间图、裸地参数敏感性、净损失对照及剩余问题。
 - [连通性与跨年蓄变](docs/CONNECTED_STORAGE_DIAGNOSIS.md)：共和闭流域路径、土壤／雪水账户、降水重建及失败对照。
+- [稳定性诊断](docs/STABILITY_DIAGNOSIS.md)：D8 约束修正、删年敏感性、组合预测、全像元留年核算及判定限制。
 - [输出字段](docs/OUTPUT_FIELDS.md)：产水、实测径流及指标含义。
 
 ## 环境与检查
