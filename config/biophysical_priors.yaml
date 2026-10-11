@@ -21,7 +21,7 @@ mapping:
     '30': grass
     '40': crop
     '50': built
-    '60': sparse
+    '60': bare
     '70': snow
     '80': water
     '90': wetland
@@ -63,8 +63,9 @@ mapping:
     '21': grass
     '22': shrub
     '23': shrub
-    '24': tree
-    '25': water
+    '24': built
+    '25': tree
     '26': water
-    '27': wetland
+    '27': water
+    '28': wetland
     '29': snow

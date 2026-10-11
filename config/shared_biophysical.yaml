@@ -1,0 +1,237 @@
+# One parameter library for all products. No product/region/year-specific overrides.
+# Screening priors, NOT a locally validated parameter set. See the evidence report.
+schema_version: 1
+status: evidence_audited_screening_priors
+reviewed_on: '2026-10-11'
+sources:
+  INVEST: https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/annual_water_yield.html
+  FAO_KC: https://www.fao.org/4/X0490E/x0490e0b.htm
+  FAO_ROOT: https://www.fao.org/4/x0490e/x0490e0e.htm
+  FAO_DUAL: https://www.fao.org/4/X0490E/x0490e0c.htm
+  JACKSON: https://jacksonlab.stanford.edu/sites/g/files/sbiybj20871/files/media/file/oecol96c.pdf
+  YANG: https://onlinelibrary.wiley.com/doi/10.1111/j.1654-1103.2009.05566.x
+  WORLDCOVER: https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/docs/WorldCover_PUM_V2.0.pdf
+  COPERNICUS: https://land.copernicus.eu/en/technical-library/global-dynamic-land-cover-product-user-manual-v3.0/@@download/file
+policy:
+  equivalent_profiles: exactly_identical_across_products
+  child_defaults: inherit_parent_unless_field_has_explicit_evidence
+  calibration: one_shared_Z_vector_Kc_multiplier_and_L_for_all_products
+  monthly_kc: no_product_specific_calendar_in_this_control
+  regional_overrides: forbidden
+  unsupported_detail: inherit_parent_and_record_limitation
+  annual_kc: nominal_values_are_hypotheses_except_conditional_water_anchor
+  kc_ranges: analyst_sensitivity_envelopes_not_confidence_intervals
+  mixed_classes: use_declared_parent_prior_not_unobserved_subclass_fractions
+  validation: no_selection_using_2022_2024
+profiles:
+  crop:
+    lulc_veg: 1
+    kc: 0.70
+    kc_range: [0.45, 0.95]
+    kc_evidence: Annual mixed-crop hypothesis; FAO stage values do not identify annual Kc.
+    kc_sources: [FAO_KC]
+    root_depth: 1400
+    root_evidence: Cereal effective-depth proxy; FAO wheat/maize ranges differ; mixture unknown.
+    root_sources: [FAO_ROOT]
+  tree:
+    lulc_veg: 1
+    kc: 0.775
+    kc_range: [0.55, 1.00]
+    kc_evidence: Annual generic-tree hypothesis retained for the control, not a measured mean.
+    kc_sources: []
+    beta: 0.970
+    root_evidence: Global temperate/tropical tree life-form d95 transfer; not local forest depth.
+    root_sources: [JACKSON]
+  shrub:
+    lulc_veg: 1
+    kc: 0.60
+    kc_range: [0.35, 0.85]
+    kc_evidence: Annual generic-shrub hypothesis; species/phenology unresolved.
+    kc_sources: []
+    beta: 0.978
+    root_evidence: Global shrub life-form d95, replacing an unjustified sclerophyllous biome proxy.
+    root_sources: [JACKSON]
+  grass:
+    lulc_veg: 1
+    kc: 0.60
+    kc_range: [0.35, 0.85]
+    kc_evidence: Annual generic-grass hypothesis; no class-specific annual measurements.
+    kc_sources: []
+    beta: 0.952
+    root_evidence: Global grass life-form d95; broad class is not exclusively temperate steppe.
+    root_sources: [JACKSON]
+  desert_vegetation:
+    lulc_veg: 1
+    kc: 0.30
+    kc_range: [0.15, 0.45]
+    kc_evidence: Annual desert-vegetation hypothesis; canopy cover still requires verification.
+    kc_sources: []
+    beta: 0.975
+    root_evidence: Desert vegetation biome d95; never assign this root to exposed sand or rock.
+    root_sources: [JACKSON]
+  bare:
+    lulc_veg: 0
+    kc: 0.15
+    kc_range: [0.05, 0.50]
+    kc_evidence: Unresolved annual evaporation; retained nominal control, not FAO total bare-soil Kc.
+    kc_sources: [FAO_DUAL]
+    root_depth: 1
+    root_evidence: Ignored sentinel for the nonvegetated branch, not a physical root.
+    root_sources: [INVEST]
+  built:
+    lulc_veg: 0
+    kc: 0.30
+    kc_range: [0.10, 0.50]
+    kc_evidence: Annual urban evaporation hypothesis; excludes municipal consumption.
+    kc_sources: []
+    root_depth: 1
+    root_evidence: Ignored sentinel.
+    root_sources: [INVEST]
+  snow:
+    lulc_veg: 0
+    kc: 0.05
+    kc_range: [0.02, 0.10]
+    kc_evidence: Sublimation placeholder; AWY lacks snow/glacier storage and melt dynamics.
+    kc_sources: []
+    root_depth: 1
+    root_evidence: Ignored sentinel.
+    root_sources: [INVEST]
+  water:
+    lulc_veg: 0
+    kc: 1.05
+    kc_range: [0.85, 1.25]
+    kc_evidence: FAO shallow-water anchor; deep reservoirs/heat storage require separate evidence.
+    kc_sources: [FAO_KC]
+    root_depth: 1
+    root_evidence: Ignored sentinel.
+    root_sources: [INVEST]
+  wetland:
+    lulc_veg: 0
+    kc: 0.90
+    kc_range: [0.60, 1.20]
+    kc_evidence: Annual hypothesis; FAO seasonal wetland values are not an annual local measurement.
+    kc_sources: [FAO_KC]
+    root_depth: 1
+    root_evidence: Ignored sentinel; AWY explicitly uses nonvegetated branch for wetlands.
+    root_sources: [INVEST]
+  moss:
+    parent: grass
+    limitation: Grass fallback only; moss/lichen physiology not represented; do not call it evidence-based.
+  rice:
+    parent: crop
+    root_depth: 750
+    root_evidence: Midpoint of FAO rice effective-root range 0.5-1.0 m; seasonal not annual measurement.
+    root_sources: [FAO_ROOT]
+    limitation: Annual Kc inherited; flooding/irrigation supply not inferred from class name.
+  deciduous_tree:
+    parent: tree
+    beta: 0.966
+    root_evidence: Temperate deciduous forest biome d95 transfer; not species-specific evidence.
+    root_sources: [JACKSON]
+  evergreen_conifer:
+    parent: tree
+    beta: 0.976
+    root_evidence: Temperate conifer biome d95 transfer; local species/soil constraints remain.
+    root_sources: [JACKSON]
+  alpine_meadow:
+    parent: grass
+    root_depth: 300
+    root_evidence: Tibetan meadow 96 percent root biomass in top 300 mm; approximate d95 transfer.
+    root_sources: [YANG]
+  alpine_steppe:
+    parent: grass
+    limitation: 86 percent in top 300 mm does not identify d95; discard earlier single-point exponential extrapolation.
+  temperate_steppe:
+    parent: grass
+    beta: 0.943
+    root_evidence: Temperate grassland biome d95 transfer.
+    root_sources: [JACKSON]
+  deciduous_conifer:
+    parent: tree
+    limitation: No separate local rooting or annual phenology evidence; inherit tree.
+  open_tree:
+    parent: tree
+    limitation: Open canopy alone does not justify invented shorter roots or a different annual Kc.
+  orchard:
+    parent: tree
+    limitation: Species, ground cover and irrigation unknown; no invented orchard-specific values.
+  shrub_garden:
+    parent: shrub
+    limitation: Species and management unknown; inherit shrub.
+  greenhouse:
+    parent: crop
+    limitation: Crop fallback only; roofs/irrigation are structural uncertainty requiring area audit.
+mapping:
+  fine:
+    '1': rice
+    '2': crop
+    '3': crop
+    '4': orchard
+    '5': shrub_garden
+    '6': greenhouse
+    '7': bare
+    '8': bare
+    '9': bare
+    '10': bare
+    '11': desert_vegetation
+    '12': bare
+    '13': deciduous_tree
+    '14': tree
+    '15': deciduous_conifer
+    '16': evergreen_conifer
+    '17': open_tree
+    '18': alpine_meadow
+    '19': grass
+    '20': alpine_steppe
+    '21': temperate_steppe
+    '22': shrub
+    '23': shrub
+    '24': built
+    '25': tree
+    '26': water
+    '27': water
+    '28': wetland
+    '29': snow
+  copernicus:
+    '20': shrub
+    '30': grass
+    '40': crop
+    '50': built
+    '60': bare
+    '70': snow
+    '80': water
+    '90': wetland
+    '100': moss
+    '111': evergreen_conifer
+    '112': tree
+    '113': deciduous_conifer
+    '114': deciduous_tree
+    '115': tree
+    '116': tree
+    '121': open_tree
+    '122': open_tree
+    '123': open_tree
+    '124': open_tree
+    '125': open_tree
+    '126': open_tree
+    '200': water
+  worldcover:
+    '10': tree
+    '20': shrub
+    '30': grass
+    '40': crop
+    '50': built
+    '60': bare
+    '70': snow
+    '80': water
+    '90': wetland
+    '100': moss
+unmapped:
+  worldcover: [95]
+mapping_limitations:
+  coarse_60: Less than or equal to 10 percent vegetation per product manuals; bare-dominant approximation, not measured zero vegetation. Do not assign homogeneous desert vegetation roots.
+  fine_11: Desert vegetation cover fraction is unspecified; cannot equate automatically to coarse 60.
+  fine_24: Updated 20261010 legend; residential land is impervious per user confirmation, uses shared built profile.
+  fine_25: Updated urban tree green space; not impervious. Lake/reservoir/wetland shifted to 26/27/28.
+  crop: Rotation information is real but its assumed annual Kc is not independently verified; isolate in a later seasonal control.
+  forest: Copernicus also has forest subtypes; supported detail is available to every product whose legend resolves it.

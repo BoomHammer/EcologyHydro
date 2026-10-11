@@ -7,9 +7,10 @@ years:
   calibration_stage2: [2019, 2020, 2021]
   validation: [2022, 2023, 2024]
 model: reach7
+shared_biophysical_registry: config/shared_biophysical.yaml
 paths:
   output_root: experiments/landcover_cross
-  prepared: project/comparison_2011_2024
+  prepared: project/comparison_2011_2024_fine_20261010
   grid_index: project/repairs/soil_routing/m2_index.json
   zones: project/repairs/closed_routing_v3/zones.tif
   pawc: project/cache/m2/aligned/pawc/0dc28d6f52acc3953d75ba39/data.tif
@@ -40,9 +41,11 @@ climate:
       raw_template: project/repairs/climate_reference_full_holdout/provider/terraclimate_current_{variable}_{year}.nc
 products:
   fine:
-    source: data/LCLU/vegetation_model_20261007_154221plusIce.tif
-    classes: data/LCLU/vegetation_model_20261007_154221.csv
-    aligned: project/cache/m2/landcover/lake_overlay/fine/eea3079eff9d56cb036129e3/data.tif
+    source: data/LCLU/vegetation_model_20261010_100411ImperviousIce.tif
+    classes: data/LCLU/vegetation_model_20261010_100411.csv
+    aligned: project/comparison_2011_2024_fine_20261010/fine/data.tif
+    native_aligned: project/comparison_2011_2024_fine_20261010/fine/native_aligned.tif
+    water_code: 26
     table_product: fine
     table_year: '2019'
     rotation_codes: [2]

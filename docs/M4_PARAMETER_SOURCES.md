@@ -1,8 +1,15 @@
 # 参数来源与使用方式
 
-更新：2026-10-10。文献依据、项目假设和率定结果分别记录，类别映射保留在配置。当前数值见 [率定与测试](MAJOR_BIAS_CALIBRATION.md)。
+当前冻结参数以[本次实验记录](FINE_2023_FOCUS.md)及其中的 `current_parameters.json` 为准。
+下文保留历史文献与参数假设，旧“当前”字样仅指当时版本；历史专题文档见归档 ZIP。
 
-最新分区及管理账户实验见 [分区与水量诊断](REGIONAL_WATER_DIAGNOSIS.md)。下文两个参数的数值保留为旧冻结基线；新三／四分区参数位于 `project/calibration/regional_water_v1/v2/parameters_*.json`，仍为条件有效参数，未替换通用生产参数。四分区精细旧年度账户条件的 Z 为 30.00、11.72、9.54、4.27（贵得以上、贵得—兰州、兰州—龙门、龙门以下），Kc 乘数 1.6835。
+> 2026-10-11 新审查：[三产品统一参数体系（归档：SHARED_PARAMETER_REVIEW.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
+> 新库为 `config/shared_biophysical.yaml`；旧表中的工程假设、草原根深单点外推和粗产品裸地植被代理
+> 不再作为新公平对照的默认依据。以下为历史参数来源记录，不代表已全部验证。
+
+更新：2026-10-10。文献依据、项目假设和率定结果分别记录，类别映射保留在配置。当前数值见 [率定与测试（归档：MAJOR_BIAS_CALIBRATION.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
+
+最新分区及管理账户实验见 [分区与水量诊断（归档：REGIONAL_WATER_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。下文两个参数的数值保留为旧冻结基线；新三／四分区参数位于 `project/calibration/regional_water_v1/v2/parameters_*.json`，仍为条件有效参数，未替换通用生产参数。四分区精细旧年度账户条件的 Z 为 30.00、11.72、9.54、4.27（贵得以上、贵得—兰州、兰州—龙门、龙门以下），Kc 乘数 1.6835。
 
 ## 参数文件
 
@@ -27,7 +34,7 @@ Jackson 分布 `F(d)=1−beta^d` 的 d 为 cm，故 `d95_mm=10×ln(0.05)/ln(beta
 
 年度 Kc 中心值、边界及根深扰动倍率含项目假设。裸岩/土/沙、盐碱地缺证据时共享蒸发近似；大棚、苔藓及部分林型有占位参数，类别变多不等于过程完整。
 
-进一步核查发现，精细 7、8、9、10、12 类使用非植被 Kc=0.15，既不受 Z 也不受植被 Kc 乘数调节；Copernicus 60 则使用植被稀疏类 Kc=0.3，不能视为等价裸地。0.10—0.50 的裸地 Kc 敏感性未形成正式取值依据，原表不变。新增净损失实验的 L 也是未识别的条件参数，不是来自文献的渗漏常数；见 [后续诊断](DRYLAND_CONNECTIVITY_DIAGNOSIS.md)。
+进一步核查发现，精细 7、8、9、10、12 类使用非植被 Kc=0.15，既不受 Z 也不受植被 Kc 乘数调节；Copernicus 60 则使用植被稀疏类 Kc=0.3，不能视为等价裸地。0.10—0.50 的裸地 Kc 敏感性未形成正式取值依据，原表不变。新增净损失实验的 L 也是未识别的条件参数，不是来自文献的渗漏常数；见 [后续诊断（归档：DRYLAND_CONNECTIVITY_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 冬小麦—夏玉米轮作
 

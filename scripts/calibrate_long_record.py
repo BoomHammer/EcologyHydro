@@ -44,7 +44,9 @@ def full_models(paths, table, cases, volume, all_stations=False):
             for name, (model, fit) in cases.items():
                 x = fit["parameters"]
                 region = regional_map(model)[data["zone"]]
-                kc = np.where(data["veg"] == 1, np.minimum(data["kc"] * x[-2], 1.3), data["kc"])
+                cap = fit.get("kc_cap", 1.3)
+                cap = np.inf if cap is None else cap
+                kc = np.where(data["veg"] == 1, np.minimum(data["kc"] * x[-2], cap), data["kc"])
                 depth = np.zeros(len(kc))
                 for group in np.unique(region):
                     selected = region == group

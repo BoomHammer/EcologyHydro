@@ -55,6 +55,12 @@ def input_paths(config, product, year):
 
 
 def product_tables(config, product, positions, weights):
+    if registry_path := config.get("shared_biophysical_registry"):
+        from ecologyhydro.shared_biophysical import load_registry, parameter_table
+
+        registry = load_registry(resolve(config, registry_path))
+        rows = parameter_table(registry, product)
+        return {year: deepcopy(rows) for year in config["forcing_years"]}, []
     settings = config["products"][product]
     base = read_json(resolve(config, config["paths"]["base_tables"]))
     original = deepcopy(base[settings["table_product"]][settings["table_year"]])

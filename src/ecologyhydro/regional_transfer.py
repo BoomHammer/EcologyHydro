@@ -15,7 +15,7 @@ def regional_map(model):
     raise ValueError("Unknown spatial model")
 
 
-def evaluate(parameters, data, model, years, jacobian=False):
+def evaluate(parameters, data, model, years, jacobian=False, kc_cap=1.3):
     """AWY minus the one constant reach loss, with analytic Z/Kc/L derivatives."""
     mapping = regional_map(model)
     n_z = int(mapping.max()) + 1
@@ -26,7 +26,10 @@ def evaluate(parameters, data, model, years, jacobian=False):
     p, et, awc = data["p"], data["et"], data["awc"]
     veg = data["veg"] == 1
     effective = data["kc"] * x[-2]
-    kc = np.where(veg, np.minimum(effective, 1.3), data["kc"])
+    cap = np.inf if kc_cap is None else float(kc_cap)
+    if cap <= 0 or np.isnan(cap):
+        raise ValueError("Kc cap must be positive or None")
+    kc = np.where(veg, np.minimum(effective, cap), data["kc"])
     ratio = et * kc / p
     log_ratio = np.log(np.maximum(ratio, 1e-300))
     uncapped = 1.25 + x[region] * awc / p
@@ -55,7 +58,7 @@ def evaluate(parameters, data, model, years, jacobian=False):
     )
     # Rare Fu=min(PET,AET) branch is handled explicitly; nonvegetated Kc is fixed.
     d_ratio = np.where(fu_aet <= ratio, d_ratio, -p)
-    d_kc = d_ratio * et / p * data["kc"] * veg * (effective < 1.3) * (depth > 0)
+    d_kc = d_ratio * et / p * data["kc"] * veg * (effective < cap) * (depth > 0)
     derivatives = np.zeros((years, 11, n_z + 2))
     inc_z = aggregate(d_z)
     for region_id in range(n_z):
@@ -92,7 +95,7 @@ def training_data(data, keep):
     return subset
 
 
-def fit_transfer(data, target, adjustment, eligible, keep, model):
+def fit_transfer(data, target, adjustment, eligible, keep, model, kc_cap=1.3):
     keep = np.asarray(keep, dtype=bool)
     target, adjustment, eligible = (np.asarray(a) for a in (target, adjustment, eligible))
     if target.shape != adjustment.shape or target.shape != eligible.shape or target.shape[1] != 7:
@@ -113,7 +116,7 @@ def fit_transfer(data, target, adjustment, eligible, keep, model):
     def compute(x):
         nonlocal cache_x, cache_result
         if cache_x is None or not np.array_equal(cache_x, x):
-            pred, jac = evaluate(x, subset, model, int(keep.sum()), jacobian=True)
+            pred, jac = evaluate(x, subset, model, int(keep.sum()), jacobian=True, kc_cap=kc_cap)
             scale = observed[valid] * np.sqrt(valid.sum())
             regularization, reg_jac = pooling(x, model)
             residual = np.r_[((pred - known)[valid] - observed[valid]) / scale, regularization]
@@ -138,7 +141,7 @@ def fit_transfer(data, target, adjustment, eligible, keep, model):
     if not converged:
         raise ValueError("No converged regional transfer fit")
     best = min(converged, key=lambda fit: fit.cost)
-    _, derivative = evaluate(best.x, subset, model, int(keep.sum()), jacobian=True)
+    _, derivative = evaluate(best.x, subset, model, int(keep.sum()), jacobian=True, kc_cap=kc_cap)
     # Data-only Jacobian: regularization must not masquerade as observational identification.
     scaled = derivative[valid] / observed[valid, None] * np.array([29] * n_z + [1.3, 100])
     return {
@@ -151,4 +154,5 @@ def fit_transfer(data, target, adjustment, eligible, keep, model):
         "objective_with_penalty": float(2 * best.cost),
         "data_jacobian_singular_values": np.linalg.svd(scaled, compute_uv=False).tolist(),
         "pooling_strength": 0.01 if model == "pooled7" else 0.0,
+        "kc_cap": kc_cap,
     }

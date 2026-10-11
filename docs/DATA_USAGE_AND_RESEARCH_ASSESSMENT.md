@@ -1,8 +1,10 @@
 # 数据使用、PET 来源与科研适用性核查
 
 **历史快照说明（2026-10-11）**：用户随后替换为 2011—2024 水文表并新增 WorldCover，
-本报告文件数和逐文件清单仅适用于更新前数据。当前执行路径、时期与九组合比较见
-[三产品交叉实验](LANDCOVER_CROSS_COMPARISON.md)；不以本报告的旧库存统计代替当前输入。
+本报告文件数和逐文件清单仅适用于更新前数据。当前执行路径和时期见
+[本次实验记录](FINE_2023_FOCUS.md)；历史九组合协议保存在
+[源码与文档归档](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)
+的 `docs/LANDCOVER_CROSS_COMPARISON.md`。不以本报告的旧库存统计代替当前输入。
 
 本报告回应用户对 PET 缺年、数据使用情况和评价门槛的核查要求。
 本次只读取现有数据与结果、计算审计统计，没有改变水文模型或重新率定。

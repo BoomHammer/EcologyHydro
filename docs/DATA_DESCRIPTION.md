@@ -1,7 +1,9 @@
 # 数据说明与确认口径
 
-更新：2026-10-11。原始数据不修改。当前输入与年份以 `config/landcover_comparison.yaml` 为准，
-预处理历史配方见 `config/m2.yaml`。新协议见 [三产品交叉实验](LANDCOVER_CROSS_COMPARISON.md)。
+更新：2026-10-12。原始数据不修改。当前实验冻结输入以
+`experiments/calibration_followup/20261011T154702_556627Z/execution_protocol.yaml` 为准，
+通用输入配置见 `config/landcover_comparison.yaml`，预处理配方见 `config/m2.yaml`。
+当前协议见 [本次实验记录](FINE_2023_FOCUS.md)。
 [数据使用核查](DATA_USAGE_AND_RESEARCH_ASSESSMENT.md) 对应本次用户更新前快照，不能用旧文件数量描述当前库存。
 
 ## 年份、测站与单位
@@ -11,8 +13,9 @@
 缺失不填零、不插值，累计账户缺失向下游传播，上游保留。
 旧 `*2013-2023.csv`／`*2018-2023.csv` 及行业表已不在当前目录；历史输出保留，不声称旧原始文件仍在。
 
-当前时期：2011—2012 预热不计分，2013—2017 与 2019—2021 合并率定，2018 桥接不计分，
-2022—2024 正式验证。只用自然年观测，不虚构月径流。2022、2023 已被历史开发查看，不称全新盲测。
+原协议分期为：2011—2012 预热，2013—2017 与 2019—2021 历史训练，2018 桥接。
+本轮 2022—2024 直接用于目标拟合和排序，不能称为正式独立验证。
+只用自然年观测，不虚构月径流。
 
 测站顺序：唐乃亥 → 贵得 → 兰州 → 下河沿 → 石嘴山 → 头道拐 → 龙门 → 三门峡 → 花园口 → 高村 → 利津。项目区间名称“龙羊峡”按用户约定对应“贵得”，不是通用地名同义关系；保留原站名和坐标。
 
@@ -50,14 +53,14 @@ CMFD 原始覆盖 1951—2024：temp 为 K、pres 为 Pa、rhum 为 %、shum 为
 本地 GEE 导出未预乘 0.1，未发现重复缩放。PET 是参考蒸散，AET 是实际蒸散，不能互换。旧 TIFF 缺少可核实小版本信息，不假定与新下载 V1.1 相同。
 
 历史提供方文件、URL、SHA256 及转换结果分别保存于 `project/repairs/climate_reference_full/` 和 `project/repairs/climate_reference_full_holdout/`（2023），现按 YAML 复用。
-历史选源按当时开发年六个代理区的降水相对 RMSE，见 [原试验结果](MAJOR_BIAS_CALIBRATION.md)；
+历史选源按当时开发年六个代理区的降水相对 RMSE，见 [原试验结果（归档：MAJOR_BIAS_CALIBRATION.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)；
 当时的开发年含新协议验证年，不能说本次整套气候方案从未接触验证时期。MOD16A2GF 暂未使用。
 
 此前补充的 2013—2018 V1.1 成对 P/PET 位于 `project/repairs/long_climate_v1/`，现继续复用。
 当前精细轮作年度 Kc 在 2011—2024 全部使用同期 V1.1 月 PET 与固定作物历计算。
 气候源曾依据后来年份选择，因此仅声称给定输入方案下的参数时间转移检验。
 
-上游主要过程诊断另在 `project/diagnostics/headwater_balance_v1/` 下载 2012 年 12 月—2022 年 12 月 V1.1 月 AET/Q/soil/swe，小范围覆盖兰州以上。AET/Q 是模型通量，soil/swe 是模型月末状态，均不是独立实测；2012 年 12 月只提供状态初值。按每个实际汇水像元的等积面积汇总，未替换生产气候／蒸散／径流，详见 [主要过程诊断](MAIN_PROCESS_DIAGNOSIS.md)。
+上游主要过程诊断另在 `project/diagnostics/headwater_balance_v1/` 下载 2012 年 12 月—2022 年 12 月 V1.1 月 AET/Q/soil/swe，小范围覆盖兰州以上。AET/Q 是模型通量，soil/swe 是模型月末状态，均不是独立实测；2012 年 12 月只提供状态初值。按每个实际汇水像元的等积面积汇总，未替换生产气候／蒸散／径流，详见 [主要过程诊断（归档：MAIN_PROCESS_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 空间与地类
 
@@ -98,15 +101,15 @@ CMFD 原始覆盖 1951—2024：temp 为 K、pres 为 Pa、rhum 为 %、shum 为
 
 农业/生态耗水与 AWY 蒸散可能重叠；回归水、地下水储量及边界对应留待下一轮明确。
 
-新六站条件账户已实现，边界与未知项没有因此得到独立验证。兰州至头道拐五年 `Q下−Q上+地表耗水+水库蓄变` 全为负值，必须继续复核净损失／储量和统计范围，不能通过 Z 率定强行闭合。详见 [诊断报告](REGIONAL_WATER_DIAGNOSIS.md)。
+新六站条件账户已实现，边界与未知项没有因此得到独立验证。兰州至头道拐五年 `Q下−Q上+地表耗水+水库蓄变` 全为负值，必须继续复核净损失／储量和统计范围，不能通过 Z 率定强行闭合。详见 [诊断报告（归档：REGIONAL_WATER_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 补充内流面参考
 
 新增 `project/references/hydrobasins_as06/` 为 HydroBASINS Asia level 06 v1c 标准版公开参考，下载来源、原始压缩包与 SHA256 见 `source.json`。ENDO=1/2 面用于诊断，不替换官方水资源区划或生产汇水区；它与 HydroRIVERS 共享 HydroSHEDS 数据来源，且该层级未必分离小型内流盆地。兰州至头道拐与黄河内流区在本地面积表中为不同条目，不能因地图包围关系直接合并账户。
 
-面状核查发现贵得上游较大的重叠范围，原有内流河采样点排除不能证明整个面已排除；见 [空间检查与局限](DRYLAND_CONNECTIVITY_DIAGNOSIS.md)。
+面状核查发现贵得上游较大的重叠范围，原有内流河采样点排除不能证明整个面已排除；见 [空间检查与局限（归档：DRYLAND_CONNECTIVITY_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
-后续明确主要重叠为共和盆地茶卡—沙珠玉参考内流面，青海湖本身与贵得增量区重叠仅约 26 km²；身份和独立文献见 [进一步诊断](CONNECTED_STORAGE_DIAGNOSIS.md)。
+后续明确主要重叠为共和盆地茶卡—沙珠玉参考内流面，青海湖本身与贵得增量区重叠仅约 26 km²；身份和独立文献见 [进一步诊断（归档：CONNECTED_STORAGE_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 补充跨年状态与降水重建
 

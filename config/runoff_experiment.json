@@ -1,37 +1,95 @@
 {
   "name": "landcover_comparison_and_scenario_research",
-  "status": "three_product_cross_parameter_trial_complete",
+  "status": "updated_fine_map_shared_control_complete",
   "updated_date": "2026-10-11",
   "work_plan": "DEVELOPMENT.md",
-  "active_config": "config/landcover_comparison.yaml",
-  "active_report": "docs/LANDCOVER_CROSS_COMPARISON.md",
-  "active_directory": "experiments/landcover_cross/20261010T182322_304737Z",
-  "active_summary": "experiments/landcover_cross/20261010T182322_304737Z/summary.json",
-  "active_predictions": "experiments/landcover_cross/20261010T182322_304737Z/predictions.csv",
-  "active_metrics": "experiments/landcover_cross/20261010T182322_304737Z/metrics.csv",
-  "active_validation_matrix": "experiments/landcover_cross/20261010T182322_304737Z/validation_matrix.csv",
+  "active_config": "config/shared_parameter_control.yaml",
+  "active_report": "docs/UPDATED_FINE_MAP.md",
+  "active_entrypoint": "scripts/experiment_shared_parameters.py",
+  "active_response_override": null,
+  "latest_diagnostic_report": "docs/UPDATED_FINE_MAP.md",
+  "latest_diagnostic_config": "config/shared_parameter_control.yaml",
+  "latest_diagnostic_directory": "experiments/shared_parameters/20261011T085010_613465Z",
+  "latest_diagnostic_outcome": "New fine-map detail-mode CV 22.733%, validation 19.825%, 2024 9.331%; Copernicus validation 15.945%, WorldCover 23.900%. Updated map adds 1596.8125 km2 residential but retains 333519.6875 km2 irrigated cropland. Data migration complete; accuracy not solved.",
+  "active_evaluation_directory": "experiments/shared_parameters/20261011T085010_613465Z",
+  "active_evaluation_summary": "experiments/shared_parameters/20261011T085010_613465Z/summary.json",
+  "annual_process_experiments": [
+    "experiments/error_2024_routing/20261011T071046_820287Z",
+    "experiments/error_2024_joint_storage/20261011T071359_707303Z"
+  ],
+  "original_annual_baseline": "experiments/landcover_cross/20261010T182322_304737Z",
+  "observation_correction_review": "experiments/observation_correction/20261011T073323_158937Z",
+  "active_directory": "experiments/shared_parameters/20261011T085010_613465Z",
+  "active_summary": "experiments/shared_parameters/20261011T085010_613465Z/summary.json",
+  "active_predictions": "experiments/shared_parameters/20261011T085010_613465Z/predictions.csv",
+  "active_metrics": "experiments/shared_parameters/20261011T085010_613465Z/predictions_metrics.csv",
+  "active_validation_matrix": null,
   "initial_trial_rejected": "experiments/landcover_cross/20261010T181430_710893Z/TRIAL_STATUS.md",
-  "products": ["fine", "copernicus", "worldcover"],
-  "cross_parameter_pairs": 9,
-  "warmup_years": [2011, 2012],
-  "bridge_years": [2018],
-  "training_window": [2013, 2021],
-  "training_years": [2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021],
-  "validation_years": [2022, 2023, 2024],
-  "first_stage_training_years": [2013, 2014, 2015, 2016, 2017],
-  "second_stage_training_years": [2019, 2020, 2021],
-  "validation_interpretation": "2022-2024 excluded from current fitting; 2022 and 2023 historically inspected, 2024 newly added",
-  "training_policy": "union of both calibration stages; freeze each product parameters for all nine pairs",
+  "products": [
+    "fine",
+    "copernicus",
+    "worldcover"
+  ],
+  "warmup_years": [
+    2011,
+    2012
+  ],
+  "bridge_years": [
+    2018
+  ],
+  "training_window": [
+    2013,
+    2021
+  ],
+  "training_years": [
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2019,
+    2020,
+    2021
+  ],
+  "validation_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "first_stage_training_years": [
+    2013,
+    2014,
+    2015,
+    2016,
+    2017
+  ],
+  "second_stage_training_years": [
+    2019,
+    2020,
+    2021
+  ],
+  "validation_interpretation": "2022-2024 excluded from fitting and candidate selection; all three years now inspected, later results are reused exploratory validation",
+  "training_policy": "One shared seven-Z/Kc/L vector jointly fit to parent mode, eight calibration years, 51 unique station-years; freeze for all three maps and both modes; new fine-map strata and source hashes required",
   "missing_policy": "No imputation; warmup and bridge unscored; 2014 missing upstream accounts propagate downstream",
   "test_year": 2024,
-  "test_year_status": "newly_added_current_protocol_validation",
-  "report": "docs/LANDCOVER_CROSS_COMPARISON.md",
+  "test_year_status": "examined_in_2024_error_diagnostics_reused_exploratory_validation",
+  "report": "docs/UPDATED_FINE_MAP.md",
   "historical_data_audit_report": "docs/DATA_USAGE_AND_RESEARCH_ASSESSMENT.md",
   "monthly_report": "docs/MONTHLY_PILOT_RESULTS.md",
   "research_metrics": "project/diagnostics/data_usage_review/station_research_metrics.csv",
   "data_inventory": "project/diagnostics/data_usage_review/data_inventory.csv",
   "pet_provenance_audit": "project/diagnostics/data_usage_review/pet_2013_2018.csv",
   "diagnostic_experiments": [
+    {
+      "directory": "experiments/error_2024/20261011T063351_535641Z",
+      "summary": "experiments/error_2024/20261011T063351_535641Z/summary.json",
+      "scope": "2024_reach_and_class_audit_training_block_CV_pooled_Z_and_uncapped_Kc_no_promotion"
+    },
+    {
+      "directory": "experiments/error_2024_dryland/20261011T064954_943951Z",
+      "summary": "experiments/error_2024_dryland/20261011T064954_943951Z/summary.json",
+      "scope": "training_block_CV_dryland_Kc_030_050_no_promotion_baseline_reused"
+    },
     {
       "directory": "project/calibration/regional_water_v1",
       "summary": "project/calibration/regional_water_v1/summary.json",
@@ -94,7 +152,7 @@
   "monthly_pilot_protocol": "project/calibration/monthly_pilot_v1/protocol.json",
   "requested_years_result": "project/calibration/requested_years_v1/summary.json",
   "requested_years_protocol": "project/calibration/requested_years_v1/protocol.json",
-  "latest_finding": "Nine AWY pairs completed for 2011-2024. Validation relative RMSE rows by parameter source (fine, copernicus, worldcover), columns by landcover in the same order: [15.626,23.314,27.680], [15.605,13.734,16.416], [15.446,11.970,13.540]. Rankings depend on parameter source; no universal fine-landcover superiority established. Maximum quadrature error is 0.546% of observed runoff.",
+  "latest_finding": "New fine-map detail-mode CV 22.733%, validation 19.825%, 2024 9.331%; Copernicus validation 15.945%, WorldCover 23.900%. Updated map adds 1596.8125 km2 residential but retains 333519.6875 km2 irrigated cropland. Data migration complete; accuracy not solved.",
   "process_diagnostics": {
     "error_origin": "project/diagnostics/error_origin_v1/summary.json",
     "headwater_balance": "project/diagnostics/headwater_balance_v1/summary.json",
@@ -105,7 +163,7 @@
   "domain_candidate": "project/repairs/closed_routing_v3/zones.tif",
   "routing_diagnostic": "project/repairs/closed_routing_v3/summary.json",
   "stability_protocol": "project/calibration/long_record_v1/protocol.json",
-  "working_reference": "Current reach7 AWY with three products and nine fixed-parameter combinations; monthly pilot and macro3/pooled7 results remain historical comparators",
+  "working_reference": "Updated 20261010 fine map, shared evidence registry, report both parent/detail controls; no winner selected on reused validation",
   "boundary_policy": "User confirms no official polygons will be supplied; use explicit gauge catchment proxies, not official water-resource polygons",
   "long_record_audit": "project/diagnostics/long_record_v2/summary.json",
   "region_maps": {
@@ -115,9 +173,19 @@
   "storage_diagnostic": "project/diagnostics/storage_change_v1/summary.json",
   "spatial_audit": "project/diagnostics/dryland_connectivity_v2/summary.json",
   "bare_evaporation_sensitivity": "project/diagnostics/bare_evaporation_v1/protocol.json",
-  "evaluation_stations": ["贵得", "兰州", "头道拐", "龙门", "三门峡", "花园口", "利津"],
+  "evaluation_stations": [
+    "贵得",
+    "兰州",
+    "头道拐",
+    "龙门",
+    "三门峡",
+    "花园口",
+    "利津"
+  ],
   "station_scope": "Seven conditional endpoints; common six and Lijin reported separately; Lijin is not the river mouth",
-  "water_accounts": ["updated_2011_2024_surface_consumption_and_storage"],
+  "water_accounts": [
+    "updated_2011_2024_surface_consumption_and_storage"
+  ],
   "production_parameter_selected": false,
   "frozen_baseline": {
     "training_summary": "project/calibration/major_bias/summary.json",
@@ -127,8 +195,22 @@
     "report": "docs/MAJOR_BIAS_CALIBRATION.md"
   },
   "target": "observed_regulated_runoff",
-  "next_priority": "consolidate_paired_landcover_results_then_landcover_change_and_CMIP6_scenarios",
+  "next_priority": "audit_updated_fine_irrigated_grass_built_disagreements_and_independently_constrain_annual_ET; do_not_revert_to_old_fine_map",
   "scenario_status": "planned_not_run",
   "data_request_policy": "Use existing and publicly obtainable inputs first; request additional data only for a specific material research question with alternatives and cost explained",
-  "policy": "Preserve frozen baseline; enforce documented closed surface domain; no selection on reused 2023, post-hoc gate relaxation, or landcover winner declaration"
+  "policy": "Preserve frozen baseline; enforce documented closed surface domain; no selection on reused 2023, post-hoc gate relaxation, or landcover winner declaration",
+  "shared_parameter_registry": "config/shared_biophysical.yaml",
+  "shared_parameter_protocol": "config/shared_parameter_control.yaml",
+  "shared_parameter_report": "docs/UPDATED_FINE_MAP.md",
+  "shared_parameter_policy": "Identical functional profiles across products; supported child overrides only; one shared Z/Kc/L fit; unresolved annual Kc priors remain explicit",
+  "shared_parameter_directory": "experiments/shared_parameters/20261011T085010_613465Z",
+  "shared_parameter_status": "updated_fine_map_six_controls_complete",
+  "active_reference_policy": "Current experiments use only the 20261010 fine map and shared parameter registry; prior LTG results are historical only",
+  "active_fine_source": "data/LCLU/vegetation_model_20261010_100411ImperviousIce.tif",
+  "active_fine_legend": "data/LCLU/vegetation_model_20261010_100411.csv",
+  "historical_ltg_directory": "experiments/ltg_response/20261011T075030_284823Z",
+  "active_parameters": "experiments/shared_parameters/20261011T085010_613465Z/fit_final.json",
+  "comparison_combinations": 6,
+  "shared_parameter_sets_per_fold": 1,
+  "historical_cross_parameter_pairs": 9
 }

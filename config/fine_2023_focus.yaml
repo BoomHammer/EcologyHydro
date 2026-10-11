@@ -1,0 +1,25 @@
+reference: experiments/calibration_followup/20261011T154702_556627Z
+baseline: experiments/independent_calibration/20261011T140426_047366Z
+local_run: experiments/independent_reach_balance/20261011T143958_063579Z
+output_root: experiments/fine_2023_focus
+products_to_calibrate: [fine]
+frozen_comparators: [fine_level1, copernicus, worldcover]
+validation_years: [2022, 2023, 2024]
+focus_year: 2023
+training_uses_focus_year: true
+selection: hard_goal_deficits_then_2023_then_pooled_error
+interpretation: development_target_fit_not_independent_validation
+# Existing seven local stores (indices 0..6), plus ONE LTG net loss (index 7).
+# The inherited bounds remain r=0..0.5 and L=0..100 (1e8 m3/year).
+# Each vector applies to every year. AWY Z/Kc/root/land-cover parameters are frozen.
+candidates:
+  - {name: baseline}
+  - {name: retention_only, free: [0, 1, 2, 3, 4, 5, 6], training_weight: 0}
+  - {name: loss_only, free: [7], training_weight: 0}
+  - {name: joint_target, free: [0, 1, 2, 3, 4, 5, 6, 7], training_weight: 0}
+  - {name: joint_train005, free: [0, 1, 2, 3, 4, 5, 6, 7], training_weight: 0.05}
+  - {name: joint_train025, free: [0, 1, 2, 3, 4, 5, 6, 7], training_weight: 0.25}
+  - {name: joint_train100, free: [0, 1, 2, 3, 4, 5, 6, 7], training_weight: 1}
+goal_1: all_three_annual_and_pooled_errors_strictly_best
+goal_2: at_least_9_of_21_station_years_strictly_best
+goal_3: secondary_transfer_diagnostic_not_current_acceptance_gate

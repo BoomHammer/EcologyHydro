@@ -26,7 +26,7 @@ mapping:
     '2': winter_wheat_summer_maize
 scope:
   fine_code_2: Apply the rotation to all current irrigated-cropland pixels as a temporary simplification of the user-confirmed majority.
-  fine_code_3: Rainfed cropland remains unspecified; do not infer the same rotation.
+  fine_code_3: 'User confirmed on 2026-10-11: rainfed cropland receives no irrigation; crop calendar remains unspecified, so do not infer the irrigated rotation.'
   copernicus_code_40: Mixed cropland; do not infer all pixels have the irrigated rotation or alter the map.
 future_subdivision:
   policy: Add new class-to-system mappings without overwriting historical legends or parameter versions.

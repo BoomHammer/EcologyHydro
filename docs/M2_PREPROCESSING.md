@@ -1,6 +1,6 @@
 # 预处理与模型约定
 
-更新：2026-10-10。M2 工程预处理及修复完成。官方 AWY、率定和测试结果见 [本轮结果](MAJOR_BIAS_CALIBRATION.md)。
+更新：2026-10-10。M2 工程预处理及修复完成。官方 AWY、率定和测试结果见 [本轮结果（归档：MAJOR_BIAS_CALIBRATION.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 配方和入口
 
@@ -14,7 +14,7 @@
 
 基础配方保留 CMFD prec 工程基线；当前 TerraClimate V1.1 成对气候由实验情景覆盖，未改写基线。
 
-最新时间验证另补齐 `project/repairs/long_climate_v1/` 的 2013—2018 P/PET，2019—2022 复用提供方 V1.1。新 `project/diagnostics/long_record_v2/macro3.tif`、`reach7.tif` 由已修正的 `closed_routing_v3/zones.tif` 合并生成，不改写旧 M2 索引。三区按头道拐／花园口合并；七区对应贵得、兰州、头道拐、龙门、三门峡、花园口、利津七个出口。0 为区外，这些是测站汇水代理而非官方二级区，详见 [长序列验证](LONG_RECORD_VALIDATION.md)。
+最新时间验证另补齐 `project/repairs/long_climate_v1/` 的 2013—2018 P/PET，2019—2022 复用提供方 V1.1。新 `project/diagnostics/long_record_v2/macro3.tif`、`reach7.tif` 由已修正的 `closed_routing_v3/zones.tif` 合并生成，不改写旧 M2 索引。三区按头道拐／花园口合并；七区对应贵得、兰州、头道拐、龙门、三门峡、花园口、利津七个出口。0 为区外，这些是测站汇水代理而非官方二级区，详见 [长序列验证（归档：LONG_RECORD_VALIDATION.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 ## 网格及输入
 
@@ -35,15 +35,15 @@
 
 青海湖种子和搜索框在配方中，闭流依据见 [FAO](https://www.fao.org/4/ag186e/AG186E03.htm)，河网字段见 [HydroRIVERS 技术文档](https://data.hydrosheds.org/file/technical-documentation/HydroRIVERS_TechDoc_v10.pdf)。
 
-仍有 286 个河网拓扑采样点分歧。新增 HydroBASINS 面状核查发现，贵得上游增量区 2 与参考内流面重叠约 10790.94 km²；兰州—头道拐重叠约 196.56 km²。点状内流河排除不等于整个内流汇水面已排除，详见 [空间核查及水量敏感性](DRYLAND_CONNECTIVITY_DIAGNOSIS.md)。参考图与 HydroRIVERS 同源且可能遗漏小盆地，尚未直接裁剪生产边界。面积和降水表用于复核，不强行匹配。唐乃亥计算面积约 122,925.875 km²、贵得约 145,376.875 km²，须区分各自参考口径。
+仍有 286 个河网拓扑采样点分歧。新增 HydroBASINS 面状核查发现，贵得上游增量区 2 与参考内流面重叠约 10790.94 km²；兰州—头道拐重叠约 196.56 km²。点状内流河排除不等于整个内流汇水面已排除，详见 [空间核查及水量敏感性（归档：DRYLAND_CONNECTIVITY_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。参考图与 HydroRIVERS 同源且可能遗漏小盆地，尚未直接裁剪生产边界。面积和降水表用于复核，不强行匹配。唐乃亥计算面积约 122,925.875 km²、贵得约 145,376.875 km²，须区分各自参考口径。
 
 ## 土壤与参数
 
-2026-10-10 后续定位：贵得增量区的大重叠主要属于共和盆地参考内流面 `4060051460`，不是青海湖本身。D8 抽查显示通用填洼可将内部洼地抬高约 112 m 并形成外排。`project/diagnostics/gonghe_connectivity_v1/zones.tif` 仅为排除此固定参考面的候选产水域；生产 D8、旧索引和历史边界没有替换。详见 [路径证据与精度检验](CONNECTED_STORAGE_DIAGNOSIS.md)。
+2026-10-10 后续定位：贵得增量区的大重叠主要属于共和盆地参考内流面 `4060051460`，不是青海湖本身。D8 抽查显示通用填洼可将内部洼地抬高约 112 m 并形成外排。`project/diagnostics/gonghe_connectivity_v1/zones.tif` 仅为排除此固定参考面的候选产水域；生产 D8、旧索引和历史边界没有替换。详见 [路径证据与精度检验（归档：CONNECTED_STORAGE_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 稳定性轮次进一步生成 `project/repairs/closed_routing_v3/`：在原 D8 图中将参考内流面向外的 652 条边终止，保留其他方向、原干流约束及测站出口，然后重新计算汇流累积量、11 站汇水面和非重叠分区。11 站仍嵌套，像元汇流累积量与累计分区面积相符；参考面内没有像元再贡献给黄河测站。除面内 10756.6875 km² 外，面外原来流入该闭流面的 148 km² 也随路径断开而排除，不能静默忽略这一差别。贵得累计面积为 134472.1875 km²，参考面积仅作核查。
 
-这是具有独立闭流边界约束的 **D8 图修正**，没有重新填 DEM，也没有恢复盆地内部真实河道、蒸发或地下水交换。面外 148 km² 的地形与分水岭归属仍需更细资料复核。旧索引和原始缓存不变，新稳定性实验显式引用 v3。v1/v2 为保留的程序调试失败目录，不作结果。详见 [稳定性检验](STABILITY_DIAGNOSIS.md)。
+这是具有独立闭流边界约束的 **D8 图修正**，没有重新填 DEM，也没有恢复盆地内部真实河道、蒸发或地下水交换。面外 148 km² 的地形与分水岭归属仍需更细资料复核。旧索引和原始缓存不变，新稳定性实验显式引用 v3。v1/v2 为保留的程序调试失败目录，不作结果。详见 [稳定性检验（归档：STABILITY_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
 
 HWSD2 按单元 ID 关联 `HWSD2_SMU/HWSD2_LAYERS`，取 `SEQUENCE=1` 优势组分。当前按分层质地、粗颗粒、矿物及盐分等计算并积分容量，已替代旧单元 AWC 简单除以 1000 的处理。
 

@@ -1,0 +1,17 @@
+baseline: experiments/independent_calibration/20261011T140426_047366Z
+local_run: experiments/independent_reach_balance/20261011T143958_063579Z
+previous_evaluation: experiments/independent_joint_balance/20261011T144830_805442Z
+diagnosis: experiments/fine_priority_diagnosis/climate_and_bounds.csv
+output_root: experiments/fine_priority
+products: [fine]
+candidates: [baseline, lower_only, headwater, headwater_lower, headwater_rain, headwater_rain_lower]
+headwater_parameters: [Z, vegetation_kc_multiplier, retention]
+headwater_bounds: [[1, 0.5, 0], [30, 1.5, 0.5]]
+headwater_starts: [[10, 1, 0.1], [29, 1.4, 0.3], [20, 0.7, 0.45]]
+max_nfev: 150
+lower_method: reuse_same_fold_increment_fitted_Z6_only
+precipitation_method: headwater_regional_bulletin_depth_proxy_only
+missing_precipitation: mean_ratio_of_this_fold_training_years
+selection: minimum_overall_training_block_cv_relative_rmse
+validation_years: [2022, 2023, 2024]
+status: exploratory_fine_only_protocol_fixed_before_candidate_scoring

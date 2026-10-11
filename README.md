@@ -1,90 +1,64 @@
 # 黄河流域年度径流模拟
 
-基于 InVEST Annual Water Yield（AWY），比较精细分类、Copernicus、ESA WorldCover v200，并研究气候和地类变化对年水量的影响。
-工程可输出 11 站产水；目前管理水量可对应的径流比较为七站，利津单列边界近似。
+本项目基于 InVEST Annual Water Yield，比较精细分类、精细分类的大类、Copernicus 和 ESA WorldCover 对黄河流域测站年径流的模拟，并为后续 CMIP6 和地类变化实验提供基础模型。
 
-## 当前进展
+## 当前任务
 
-**2026-10-11 当前协议**：2011—2012 预热，2013—2017 与 2019—2021 合并率定，2018 桥接不评估，
-2022—2024 正式验证。新水文表已接入，2011—2024 成对 P/PET 已补齐；三个地类产品各率定一套参数，
-再固定参数执行 **3×3 九组合**。详情及最新试跑结果见 [三产品交叉实验](docs/LANDCOVER_CROSS_COMPARISON.md)。
-所有当前输入路径、时期、下载来源及资源限制由 [YAML 配方](config/landcover_comparison.yaml) 管理。
-本轮已完成并通过全像元精度检查，输出 882 行七站条件径流、1386 行十一站产水及九份独立组合 CSV。
-三年验证的产品排序依赖参数来源，不能据此宣布精细图普遍更优。
+精细分类的两个开发期数值目标已完成，其余三种方案保持冻结。当前状态与执行边界见 [DEVELOPMENT.md](DEVELOPMENT.md)。
 
-数据预处理、汇水区修复、年模型率定、时间顺序验证和上游月尺度试点均已完成。
-**已有结果可支持继续科研分析；CMIP6 和地类变化情景尚未开展。**
+以后固定输出三张表：
 
-下表是**历史双产品试验**：2013—2017 固定率定、2019—2022 七站检验，不是新协议结果；相对 RMSE 越小越好。
+1. 2022、2023、2024 年总误差及三年整体误差：精细分类必须 4/4 严格最优。
+2. 2022—2024 的 21 个站年误差：精细分类必须至少 9/21 严格最优。
+3. 4×4 参数互换矩阵：用于辅助确认精细分类互换后没有明显偏弱。
 
-| 方案 | 精细分类相对 RMSE | Copernicus 相对 RMSE | 达文献参考标准的站数（精细／Copernicus） |
-| --- | ---: | ---: | ---: |
-| 七区年模型 | 13.70% | 14.65% | 4/7、3/7 |
-| 贵得以上月模型＋原下游区间 | 9.12% | 13.29% | 6/7、6/7 |
+最新固定结果为 [三张结果表](experiments/fine_2023_focus/20261011T164652_986860Z/report/three_tables.html)：表一 4/4，表二 14/21；2023 年误差 5.958465%，三年整体 5.567379%。详细口径见 [验收目标](docs/TWO_ACCURACY_GOALS.md)，完整过程、参数、科学限制及清理记录见 [本次实验记录](docs/FINE_2023_FOCUS.md)。
 
-“文献参考标准”是逐站 NSE＞0.50、R²＞0.60、绝对 PBIAS≤15%，不等于相对 RMSE＜15%。
-每站仅四个检验年，且这些年份已参与开发；数值来源、文献和限制见 [科研适用性核查](docs/DATA_USAGE_AND_RESEARCH_ASSESSMENT.md)。
-精细月模型利津 NSE 为 0.453，仍是薄弱站。两套静态地类图年份不同，优势的稳健程度需要配对比较。
+2022—2024 直接参与本轮拟合和选型；历史折重拟合 CV 从 14.091% 升到 18.536%。结果不能作为独立验证、地类优越性或未来情景预测可靠性的证明。完整站年、固定模型、水量账户和不利结果均保留。
 
-七区年模型保留为 AWY 工作参考，月模型作为扩展对照。
-月试点未通过原定模型替换规则，与“研究不可继续”不同。
-后续先整理地类比较，再用冻结参数开展地类变化及 CMIP6 情景，报告敏感性。
-独立 ET、积雪资料可用于专项过程问题，不作为所有后续工作的前置条件。
+## 水文口径
 
-## 数据与入口
+- 旱地是雨养农田，不灌溉；水浇地才允许灌溉补水。
+- InVEST 年产水量与测站实测径流并非同一概念。河道传输、库坝调蓄、耗水、外调水和储量变化需要单独核对。
+- `data/Hydrology/` 中新增的三份水资源公报用于核对概念、单位和水量账户，不能将外调水直接当成本地灌溉，也不能重复扣除已经计入 ET 的耗水。
 
-- 原始数据在 `data/`；基础缓存、补下载资料和实验结果在 `project/`。
-- `data/Climate/TerraClimate_PET/` 仅有 2019—2023 年；**2013—2018 P/PET 已补齐**，位于 `project/repairs/long_climate_v1/`，每年 12 个月及指纹已核验。
-- 新协议统一年度 P/PET 在 `project/comparison_2011_2024/climate/`，覆盖 2011—2024；已有原始文件按 YAML 复用，另补 2011、2012、2024。
-- [runoff_experiment.json](config/runoff_experiment.json) 定位当前状态，各实验 `protocol.json` 定义年份与规则。
-- `config.yaml` 同步当前率定／验证年份；实际交叉实验须使用 `config/landcover_comparison.yaml`，旧专题脚本不是当前入口。
-- 2018 缺管理账户，当前协议正常计算产水但不评估；2022、2023 已被历史开发查看，2024 新增。
+## 项目结构
 
-## 阅读顺序
+```text
+data/          原始气象、DEM、地表覆盖、土壤和水文数据
+project/       可复用的预处理数据与缓存
+experiments/   每次实验的协议、日志、候选与结果
+config/        实验配置
+scripts/       程序入口与报告脚本
+src/           Python 源码
+docs/          当前实验记录、方法、数据与字段说明
+```
 
-| 文档 | 用途 |
-| --- | --- |
-| [开发状态与计划](DEVELOPMENT.md) | 当前任务、下一步顺序、交付条件 |
-| [三产品交叉实验](docs/LANDCOVER_CROSS_COMPARISON.md) | 当前时期、WorldCover、九组合、运行命令及结果 |
-| [数据与科研适用性核查](docs/DATA_USAGE_AND_RESEARCH_ASSESSMENT.md) | PET 来源、逐文件使用清单、NSE/PBIAS、方法更正 |
-| [月尺度试点](docs/MONTHLY_PILOT_RESULTS.md) | 月模型、原删年检验、下游区间诊断 |
-| [长序列验证](docs/LONG_RECORD_VALIDATION.md) | 七区年模型、三区对照及时间验证 |
-| [指定年份结果](docs/REQUESTED_YEAR_VALIDATION.md) | 2018 粗略检查和 2023 复用年结果 |
-| [数据说明](docs/DATA_DESCRIPTION.md) | 数据、单位、年份及管理账户口径 |
-| [预处理](docs/M2_PREPROCESSING.md)、[参数来源](docs/M4_PARAMETER_SOURCES.md)、[输出字段](docs/OUTPUT_FIELDS.md) | 方法、参考文献、字段定义 |
+## 当前入口
 
-其余专题报告保留历史依据，阶段性的“下一步”以 DEVELOPMENT 为准。
-历史实验代码仍承担复现和核验依赖。已撤下的过程代理约束实验见核查报告第 4 节；
-删除及恢复说明见 [清理记录](project/archives/cleanup_monthly_constraints_20261010.md)。
+- 配置：`config/fine_2023_focus.yaml`
+- 实验：`scripts/experiment_fine_2023_focus.py`
+- 报告：`scripts/report_fine_focus.py`
+- 目标判定：`src/ecologyhydro/fine_focus_goals.py`
+- 冻结对照：`experiments/calibration_followup/20261011T154702_556627Z`
 
-## 运行与验证
+旧实验入口、未使用配方和重复文档已清理。当前计算和测试仍依赖的公共函数保留，部分文件沿用旧名称。历史源码、配置和文档可从[清理前快照](experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)恢复；全部历史实验结果继续保留。
 
-独立 Windows 环境：Python 3.12、InVEST 3.20.2、GDAL 3.10 系列，构建锁见 `locks/conda-win-64.lock`。
-首次安装执行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`。
-已有环境在根目录运行：
+## 环境与检查
+
+Windows 环境使用 Python 3.12、InVEST 3.20.2 和 GDAL 3.10 系列，依赖锁见 `locks/conda-win-64.lock`。首次安装：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python scripts/prepare_comparison.py --config config/landcover_comparison.yaml
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python scripts/run_landcover_comparison.py --config config/landcover_comparison.yaml
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
+```
+
+常用检查：
+
+```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ecologyhydro doctor
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m pytest
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ruff check src scripts
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run.ps1 python -m ruff format --check src scripts
 ```
 
-| 工作 | scripts 下的入口 |
-| --- | --- |
-| 当前三产品准备、九组合运行 | `prepare_comparison.py`、`run_landcover_comparison.py`（均显式传 `--config`） |
-| 当前九组合核验与独立结果导出 | `report_landcover_comparison.py`（传 `--config` 和 `--run`） |
-| 长序列气候准备、率定 | `prepare_long_climate.py`、`calibrate_long_record.py` |
-| 长序列核验、汇总 | `verify_long_record.py`、`summarize_long_record.py` |
-| 月试点准备、率定 | `prepare_monthly_pilot.py`、`run_monthly_pilot.py` |
-| 月试点汇总、报告 | `summarize_monthly_pilot.py`、`report_monthly_pilot.py` |
-| 指定年份核算 | `validate_requested_years.py`、`summarize_requested_years.py` |
-| 数据使用、PET 和科研指标审计 | `audit_data_usage.py` |
-
-准备和率定入口通常拒绝覆盖完成目录；阅读脚本参数后再复现，已有结果无需重复率定。
-旧审计输出在 `project/diagnostics/data_usage_review/`，对应更新前快照，不代表用户替换表格后的当前库存。
-
-大栅格分块、缓存复用，默认双进程、每任务单线程；内存预算 24 GiB，单次上限 12 小时。
-原始数据和历史结果保留；`AGENTS.md` 仅由人工修改。
+大栅格计算使用分块和缓存，默认采用受控并行并限制内存占用，以适配 32 GiB 内存。外部数据与方法必须在相应专题文档中记录来源和参考文献。`AGENTS.md` 只能由人工修改。
