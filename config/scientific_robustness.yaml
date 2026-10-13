@@ -1,0 +1,20 @@
+reference: experiments/calibration_followup/20261011T154702_556627Z
+accepted: experiments/fine_2023_focus/20261011T164652_986860Z
+local_run: experiments/independent_reach_balance/20261011T143958_063579Z
+output_root: experiments/scientific_robustness
+products: [fine, fine_level1, copernicus, worldcover]
+target_years: [2022, 2023, 2024]
+training_weights: [0, 0.05, 0.25, 1]
+ridge_strengths: [0, 0.001, 0.01, 0.1]
+sharing: [shared, three_zone, regional]
+starts_per_fit: 3
+max_workers: 2
+primary_comparators: frozen_reference
+primary_goals: [annual_4_of_4, station_year_at_least_9_of_21]
+selection: goals_then_historical_cv_then_fewer_routing_parameters_then_target_error
+equal_budget_diagnostic: same_candidate_grid_and_minimum_target_plus_training_objective
+independent_validation: unavailable_until_new_unseen_complete_observations_and_forcing
+references:
+  - https://doi.org/10.5194/hess-24-5519-2020
+  - https://doi.org/10.5194/hess-17-149-2013
+  - https://doi.org/10.5194/hess-20-2913-2016

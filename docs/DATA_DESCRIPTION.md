@@ -3,7 +3,7 @@
 更新：2026-10-12。原始数据不修改。当前实验冻结输入以
 `experiments/calibration_followup/20261011T154702_556627Z/execution_protocol.yaml` 为准，
 通用输入配置见 `config/landcover_comparison.yaml`，预处理配方见 `config/m2.yaml`。
-当前协议见 [本次实验记录](FINE_2023_FOCUS.md)。
+当前数值基线见 [科学稳健性记录](SCIENTIFIC_ROBUSTNESS.md)，下一阶段方案见 [严格比较设计](RIGOROUS_COMPARISON_PLAN.md)。
 [数据使用核查](DATA_USAGE_AND_RESEARCH_ASSESSMENT.md) 对应本次用户更新前快照，不能用旧文件数量描述当前库存。
 
 ## 年份、测站与单位
@@ -57,7 +57,8 @@ CMFD 原始覆盖 1951—2024：temp 为 K、pres 为 Pa、rhum 为 %、shum 为
 当时的开发年含新协议验证年，不能说本次整套气候方案从未接触验证时期。MOD16A2GF 暂未使用。
 
 此前补充的 2013—2018 V1.1 成对 P/PET 位于 `project/repairs/long_climate_v1/`，现继续复用。
-当前精细轮作年度 Kc 在 2011—2024 全部使用同期 V1.1 月 PET 与固定作物历计算。
+历史轮作实验曾使用同期 V1.1 月 PET 与固定作物历计算年度 Kc；当前三参数基线的
+`class_response` / `official_depth` 使用共享参数库与功能型乘数，不能把历史轮作实现写成当前已启用过程。
 气候源曾依据后来年份选择，因此仅声称给定输入方案下的参数时间转移检验。
 
 上游主要过程诊断另在 `project/diagnostics/headwater_balance_v1/` 下载 2012 年 12 月—2022 年 12 月 V1.1 月 AET/Q/soil/swe，小范围覆盖兰州以上。AET/Q 是模型通量，soil/swe 是模型月末状态，均不是独立实测；2012 年 12 月只提供状态初值。按每个实际汇水像元的等积面积汇总，未替换生产气候／蒸散／径流，详见 [主要过程诊断（归档：MAIN_PROCESS_DIAGNOSIS.md）](../experiments/maintenance/20261012_experiment_cleanup/source_before_cleanup.zip)。
@@ -72,14 +73,14 @@ CMFD 原始覆盖 1951—2024：temp 为 K、pres 为 Pa、rhum 为 %、shum 为
 | 地类 | 原文件与约定 |
 | --- | --- |
 | Copernicus | `LCLU/Copernicus_Landcover_100m.tif`，2019 年、EPSG:3857；配套 `Copernicus_CGLS_LC100_Mapping.csv` |
-| 精细分类 | `LCLU/vegetation_model_20261007_154221plusIce.tif`，代表 2023 年、EPSG:4326、0.00225°；配套 `vegetation_model_20261007_154221.csv` |
+| 精细分类 | 当前 `LCLU/vegetation_model_20261010_100411ImperviousIce.tif`；配套 `vegetation_model_20261010_100411.csv`；用户于 2026-10-12 再次确认代表 2023 年，文件时间不是制图年份 |
 | ESA WorldCover v200 | `LCLU/ESA_WorldCover_v200.tif`，代表 2021 年；本地 EPSG:4326、约 0.000898315°，不是原生 10 m；配套 `ESA_WorldCover_10m_v200_Mapping.csv` |
 
-当前三套图均固定用于 2011—2024，不构成历史地类重建。精细指类别细分，不表示空间分辨率更高；建筑/不透水类别尚待补齐，当前为已授权试算版本。图源年份差异也是比较局限。
+当前三套图均固定用于 2011—2024，不构成历史地类重建。精细指类别细分，不表示空间分辨率更高；当前版本已包含 24 类居住地（按用户确认作不透水）、25 类乔木绿地。图源年份差异也是比较局限。
 
-精细编码为 1—27、29（冰川/永久积雪），0 无定义，不赋参数或重编码为裸地。文件声明 NoData=2147483647 与实际出现 0 是不同事实。Copernicus 0/255 不作有效地类。DEM 与 Copernicus 原点相差半像元，不能按原行列直接叠加。
+当前精细编码为 1—29，26/27/28 为湖泊、水库/坑塘、草本沼泽，29 为冰川/永久积雪。0 无定义，不赋参数或重编码为裸地。旧版文件声明 NoData=2147483647 与实际出现 0 是不同事实，不据此推断新版的元数据。Copernicus 0/255 不作有效地类。DEM 与 Copernicus 原点相差半像元，不能按原行列直接叠加。
 
-用户确认精细图湖泊类别不可靠，现以已有湖泊 shp 覆盖。精细 2 类水浇地大部分为冬小麦—夏玉米轮作，目前全类采用该近似，不推广至旱地或 Copernicus 全部耕地。
+用户确认精细图湖泊类别不可靠，现以已有湖泊 shp 覆盖。用户曾说明精细 2 类水浇地大部分为冬小麦—夏玉米轮作，历史轮作试验采用过该近似，不推广至旱地或 Copernicus 全部耕地；当前共享参数基线没有启用这套显式轮作过程。
 
 ## 土壤
 

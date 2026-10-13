@@ -1,0 +1,12 @@
+reference: experiments/calibration_followup/20261011T154702_556627Z
+accepted: experiments/fine_2023_focus/20261011T164652_986860Z
+baseline: experiments/independent_calibration/20261011T140426_047366Z
+local_run: experiments/independent_reach_balance/20261011T143958_063579Z
+output_root: experiments/scientific_robustness_final
+validation_years: [2022, 2023, 2024]  # Legacy field name; these are development years.
+screens:
+  - experiments/scientific_robustness/20261011T171754_939947Z
+  - experiments/scientific_robustness/20261011T172007_290340Z
+selection: goals_then_historical_cv_then_fewer_routing_parameters_then_target_error
+equal_budget_selection: minimum_target_error_then_fewer_parameters_then_name
+interpretation: adaptive_development_fit_not_independent_validation

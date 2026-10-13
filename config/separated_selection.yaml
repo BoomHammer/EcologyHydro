@@ -1,0 +1,33 @@
+reference: experiments/calibration_followup/20261011T154702_556627Z
+accepted: experiments/scientific_robustness_final/20261011T172623_968568Z
+samples: experiments/independent_calibration/20261011T140426_047366Z/samples
+output_root: experiments/separated_selection
+products: [fine, fine_level1, copernicus, worldcover]
+candidates: [global, regional]
+# No new class-specific Kc, root, phenology or irrigation contrasts.
+biophysical_library: unchanged_reference
+calibrated_parameters: global_or_seven_Z_one_common_Kc_one_L_one_retention
+starts: 3
+max_nfev: 150
+selection: mean_squared_relative_training_fold_error_all_four_maps_then_fewer_parameters
+inner_folds:
+  - {name: early, train: [2013, 2014, 2015], held: [2016, 2017]}
+  - {name: late, train: [2013, 2014, 2015, 2016, 2017], held: [2019, 2020, 2021]}
+outer_diagnostic:
+  select_with: [early]
+  evaluate_with: late
+  interpretation: one_retrospective_nested_forward_fold_not_independent_blind_validation
+final_train: [2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021]
+target_years: [2022, 2023, 2024]
+stages: [selection_and_parameter_seal, full_pixel_common_and_independent_comparison]
+shared_fit_weight: equal_per_representation_not_independent_replicates
+independent_structure_selection: same_selected_architecture_across_products
+goal_annual: 4
+goal_station_years: 9
+goal_denominator: 21
+transfer: complete_current_4_by_4
+failed_goals: publish_preserve_accepted_baseline_do_not_change_selection
+max_workers: 2
+memory_budget_gb: 24
+interpretation: historical_data_already_exposed_new_fit_excludes_target_outcomes
+map_epochs: {fine: 2023, fine_level1: 2023, copernicus: 2019, worldcover: 2021}

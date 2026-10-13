@@ -4,7 +4,9 @@
 
 ## 当前任务
 
-精细分类的两个开发期数值目标已完成，其余三种方案保持冻结。当前状态与执行边界见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+已按最新指示实施“先分离选型并封存、再做两组公平比较”，细类参数库保持不变，执行记录见 [RIGOROUS_COMPARISON_PLAN.md](docs/RIGOROUS_COMPARISON_PLAN.md)。原三参数开发期达标版本保留，其三个历史对照保持冻结；新公平实验单独验收。当前状态与执行边界见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+
+本轮[公平比较结果](experiments/separated_selection/20261011T175947_776825Z/three_tables.html)：独立率定 **0/4、7/21**，共用参数 **1/4、7/21**，均未达标。旧基线的 4/4、14/21 不代表新实验获胜。
 
 以后固定输出三张表：
 
@@ -12,9 +14,9 @@
 2. 2022—2024 的 21 个站年误差：精细分类必须至少 9/21 严格最优。
 3. 4×4 参数互换矩阵：用于辅助确认精细分类互换后没有明显偏弱。
 
-最新固定结果为 [三张结果表](experiments/fine_2023_focus/20261011T164652_986860Z/report/three_tables.html)：表一 4/4，表二 14/21；2023 年误差 5.958465%，三年整体 5.567379%。详细口径见 [验收目标](docs/TWO_ACCURACY_GOALS.md)，完整过程、参数、科学限制及清理记录见 [本次实验记录](docs/FINE_2023_FOCUS.md)。
+保留的开发期基线为 [三张结果表](experiments/scientific_robustness_final/20261011T172623_968568Z/report/three_tables.html)：表一 4/4，表二 14/21；2023 年误差 5.791023%，三年整体 5.696205%。详细口径见 [验收目标](docs/TWO_ACCURACY_GOALS.md)，该版本的对照、敏感性和资料缺口见 [基线实验记录](docs/SCIENTIFIC_ROBUSTNESS.md)，首版实验及清理记录见 [FINE_2023_FOCUS.md](docs/FINE_2023_FOCUS.md)。
 
-2022—2024 直接参与本轮拟合和选型；历史折重拟合 CV 从 14.091% 升到 18.536%。结果不能作为独立验证、地类优越性或未来情景预测可靠性的证明。完整站年、固定模型、水量账户和不利结果均保留。
+2022—2024 直接参与拟合和选型；历史 CV 从上一版 18.536% 改善至 17.874%，仍差于原历史基线的 14.091%。对等追加搜索中精细分类仅为 1/4、5/21，未达同样目标。结果不能作为独立验证、地类优越性或未来情景可靠性的证明。新独立验证协议已封存，但仍待完整外部资料。
 
 ## 水文口径
 
@@ -36,8 +38,10 @@ docs/          当前实验记录、方法、数据与字段说明
 
 ## 当前入口
 
-- 配置：`config/fine_2023_focus.yaml`
-- 实验：`scripts/experiment_fine_2023_focus.py`
+- 分离选型与公平比较：`scripts/experiment_separated_selection.py`，配方 `config/separated_selection.yaml`
+- 筛选配置：`config/scientific_robustness.yaml`、`config/scientific_robustness_refined.yaml`
+- 筛选：`scripts/experiment_scientific_robustness.py`
+- 当前发布：`scripts/publish_scientific_robustness.py`，配置 `config/scientific_robustness_publish.yaml`
 - 报告：`scripts/report_fine_focus.py`
 - 目标判定：`src/ecologyhydro/fine_focus_goals.py`
 - 冻结对照：`experiments/calibration_followup/20261011T154702_556627Z`

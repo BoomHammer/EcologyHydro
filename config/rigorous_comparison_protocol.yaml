@@ -1,0 +1,84 @@
+# Design for the next development batch; not a completed experiment or external preregistration.
+schema_version: 1
+status: superseded_by_user_scope
+active_execution_config: config/separated_selection.yaml
+user_scope: selection_before_fair_comparison_no_new_class_processes_no_map_audit_prerequisite
+date: '2026-10-12'
+existing_result: experiments/scientific_robustness_final/20261011T172623_968568Z
+information_audit: experiments/landcover_information/20261011T174055_632941Z
+map_epochs:
+  fine: {year: 2023, evidence: user_confirmation_2026_10_12}
+  fine_level1: {year: 2023, evidence: derived_from_same_fine_map}
+  copernicus: {year: 2019, evidence: existing_project_documentation, source_metadata_check: pending}
+  worldcover: {year: 2021, evidence: v200_product_and_existing_project_documentation}
+goals_unchanged:
+  years: [2022, 2023, 2024]
+  stations: [贵得, 兰州, 头道拐, 龙门, 三门峡, 花园口, 利津]
+  annual_and_pooled_strict_wins_required: 4
+  station_year_strict_wins_required: 9
+  station_year_total: 21
+  transfer: complete_4_by_4_secondary
+  every_row: one_fixed_model_all_years_and_stations
+interpretation:
+  primary_old_table: frozen_comparator_development_progress
+  next_fair_table: all_four_rerun_same_rules_goals_not_relaxed
+  years_2011_2024: already_exposed_development_data_never_blind
+  new_external_test: separate_sealed_protocol_before_new_observations
+  no_promise_of_ranking: true
+  calendar_hindcast: static_2023_fine_map_not_historical_landcover_reconstruction
+design:
+  detail_ablation: same_2023_map_same_grid_true_level1_legend
+  product_comparison: identical_climate_soil_domain_mask_water_overlay_and_accounts
+  epoch_control: additional_independently_reconstructed_same_epoch_maps_required_for_pure_detail_claim
+  coarse_parameters: training_only_estimated_mixtures_or_shared_evidence_not_intentionally_bad_means
+  parameter_library: same_physical_profile_same_parameters_across_maps
+  common_management: one_shared_account_and_routing_model_primary_mechanistic_control
+  independent_calibration: same_architectures_bounds_starts_stopping_rules_secondary_performance_control
+  spatial_validation: nonoverlapping_incremental_catchments_avoid_upstream_nested_leakage
+  temporal_validation: rolling_origin_outer_and_inner_training_only
+  existing_data_cv_label: retrospective_nested_diagnostic_not_new_independent_validation
+  selection: mean_training_inner_fold_error_across_four_maps_no_target_rank_in_objective
+  scoring: existing_relative_RMSE_and_station_absolute_relative_error
+  interval_residuals: diagnostic_only_do_not_replace_primary_metrics
+  uncertainty: paired_year_blocks_preserve_all_seven_stations_no_21_independent_replicates_claim
+candidate_processes:
+  - id: annual_baseline
+    state: existing
+  - id: observed_phenology
+    state: requires_QC_LAI_or_phenology_and_external_ET_constraints
+    priority: 1
+    control: supported_profiles_available_to_every_product_no_arbitrary_child_Kc
+    annual_reduction: PET_weighted_Kc_not_sum_of_twelve_independent_annual_Budyko_runs
+  - id: soil_root_interaction
+    state: requires_root_restricting_depth_semantics_and_uncertainty_audit
+    priority: 1
+    control: same_soil_realizations_for_all_four_maps
+  - id: irrigation_partition
+    state: requires_irrigated_area_crop_calendar_and_withdrawal_returnflow_evidence
+    priority: 2
+    rainfed_irrigation: forbidden
+    accounting: replace_overlapping_ET_or_consumption_terms_never_add_both
+  - id: snow_and_storage
+    state: add_only_if_independent_process_residuals_require_it
+    priority: 3
+    control: shared_physical_structure_not_fine_only_error_correction
+external_constraints:
+  mod16: model_derived_auxiliary_not_ground_truth_has_landcover_dependency_QC_required
+  alternative_ET_or_towers: independent_lineage_check_required
+  storage: GRACE_basin_scale_not_fine_subcatchment_truth
+  water_accounts: reconcile_spatial_boundary_time_units_and_internal_transfers
+execution:
+  max_workers: 2
+  threads_per_worker: 1
+  memory_budget_gb: 24
+  strategy: cached_class_soil_climate_responses_then_official_full_pixel_verification
+  next_batch_stops: after_declared_candidates_report_all_do_not_expand_until_fine_wins
+scenario_rules:
+  CMIP6: multi_GCM_and_management_assumptions_separate_from_natural_yield
+  landcover_change: change_labels_then_apply_frozen_profile_rules_no_outcome_refitting
+  future_effective_loss: uncertain_management_assumption_not_measured_constant
+references:
+  - https://hess.copernicus.org/articles/19/839/2015/
+  - https://hess.copernicus.org/articles/21/3125/2017/
+  - https://lpdaac.usgs.gov/documents/93/MOD16_ATBD.pdf
+  - https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/annual_water_yield.html
