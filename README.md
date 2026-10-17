@@ -2,6 +2,8 @@
 
 本项目基于 InVEST Annual Water Yield，比较精细分类、精细分类的大类、Copernicus 和 ESA WorldCover 对黄河流域测站年径流的模拟，并为后续 CMIP6 和地类变化实验提供基础模型。
 
+数据、方法及软件的参考文献、DOI 和使用状态见 [参考文献汇总](docs/REFERENCES.md)。
+
 ## 当前任务
 
 已按最新指示实施“先分离选型并封存、再做两组公平比较”，细类参数库保持不变，执行记录见 [RIGOROUS_COMPARISON_PLAN.md](docs/RIGOROUS_COMPARISON_PLAN.md)。原三参数开发期达标版本保留，其三个历史对照保持冻结；新公平实验单独验收。当前状态与执行边界见 [DEVELOPMENT.md](DEVELOPMENT.md)。

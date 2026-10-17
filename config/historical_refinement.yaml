@@ -1,0 +1,39 @@
+reference: experiments/calibration_followup/20261011T154702_556627Z
+accepted: experiments/scientific_robustness_final/20261011T172623_968568Z
+baseline: experiments/separated_selection/20261011T175947_776825Z
+samples: experiments/independent_calibration/20261011T140426_047366Z/samples
+output_root: experiments/historical_refinement
+products: [fine, fine_level1, copernicus, worldcover]
+# Fixed before fitting; no changes based on target-period rankings.
+candidates:
+  regional: {ridge: 0.0, half_life_years: null}
+  shrink_weak: {ridge: 0.001, half_life_years: null}
+  shrink_moderate: {ridge: 0.01, half_life_years: null}
+  recent: {ridge: 0.0, half_life_years: 3.0}
+  recent_shrink: {ridge: 0.001, half_life_years: 3.0}
+biophysical_library: unchanged_reference
+starts: 3
+max_nfev: 150
+selection: pooled_unweighted_historical_held_relative_squared_error_all_four_maps
+tie_break: declared_candidate_order_baseline_first
+inner_folds:
+  - {name: early, train: [2013, 2014, 2015], held: [2016, 2017]}
+  - {name: late, train: [2013, 2014, 2015, 2016, 2017], held: [2019, 2020, 2021]}
+outer_diagnostic:
+  select_with: [early]
+  evaluate_with: late
+final_train: [2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021]
+target_years: [2022, 2023, 2024]
+goal_station_years: 11
+goal_denominator: 21
+goal_annual: 3
+goal_overall_improves_over_baseline: true
+transfer: complete_current_4_by_4
+max_workers: 2
+memory_budget_gb: 24
+interpretation: retrospective_method_development_historical_only_selection
+references:
+  - https://storage.googleapis.com/releases.naturalcapitalproject.org/invest/3.19.0/userguide/en/annual_water_yield.html
+  - https://hess.copernicus.org/articles/24/5519/2020/
+  - https://hess.copernicus.org/articles/17/149/2013/
+  - https://jmlr.org/papers/v11/cawley10a.html

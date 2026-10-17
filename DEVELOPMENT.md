@@ -1,6 +1,14 @@
 # 开发状态与唯一当前任务
 
-更新：2026-10-12。本文件保留当前有效目标、验收口径和执行边界。当前分离选型与公平比较记录见 [RIGOROUS_COMPARISON_PLAN.md](docs/RIGOROUS_COMPARISON_PLAN.md)，保留的达标基线记录见 [SCIENTIFIC_ROBUSTNESS.md](docs/SCIENTIFIC_ROBUSTNESS.md)，首版记录见 [FINE_2023_FOCUS.md](docs/FINE_2023_FOCUS.md)。旧实验结果保留在 `experiments/`，已替代的旧源码和文档保存在清理前 ZIP；其阶段性任务和旧门槛不再生效。
+更新：2026-10-13。本文件保留当前有效目标、验收口径和执行边界。当前分离选型与公平比较记录见 [RIGOROUS_COMPARISON_PLAN.md](docs/RIGOROUS_COMPARISON_PLAN.md)，保留的达标基线记录见 [SCIENTIFIC_ROBUSTNESS.md](docs/SCIENTIFIC_ROBUSTNESS.md)，首版记录见 [FINE_2023_FOCUS.md](docs/FINE_2023_FOCUS.md)。旧实验结果保留在 `experiments/`，已替代的旧源码和文档保存在清理前 ZIP；其阶段性任务和旧门槛不再生效。
+
+## 2026-10-13 最新指示（优先于下方历史门槛）
+
+用户要求在尽量客观比较下，让精细分类误差更小、多数情况下略优即可；并明确确认“继续历史期选型，优先保持客观性”。本轮将多数站年解释为至少 11/21 严格优于另外三图，同时报告年度及整体四项的实际胜数和相对原结果的误差变化；3/4 为多数汇总指标的辅助目标，不要求明显领先。旧 4/4、9/21 属于历史门槛，不替代本次指示。
+
+新增入口 `scripts/experiment_historical_refinement.py`，配置 `config/historical_refinement.yaml`，方法和参考文献见 [HISTORICAL_REFINEMENT.md](docs/HISTORICAL_REFINEMENT.md)。固定五个候选检验分区 Z 约束与历史近期加权，四图对等预算；参数库和账户保持，不增加类别专属参数。历史期选型封存后评价目标期，不能按目标排名追加搜索。原始结果与 AGENTS.md 保留。
+
+本轮已完成：[三张结果表](experiments/historical_refinement/20261013T150526_240357Z/three_tables.html)、[审计说明](experiments/historical_refinement/20261013T150526_240357Z/analysis.md)、[执行记录](docs/HISTORICAL_REFINEMENT_RESULTS.md)。**多数最优目标未达成**：独立率定精细图整体相对 RMSE 为 12.805157%（原 12.796501%），0/4、7/21；共用参数组降至 9.813288%（原 12.205820%），但仅 1/4、5/21。不能将共用参数的误差下降表述为精细图已在多数情况下获胜。两组历史选型均完成，原结果和基线保留。
 
 ## 最高优先级
 
