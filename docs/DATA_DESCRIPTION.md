@@ -73,7 +73,7 @@ CMFD 原始覆盖 1951—2024：temp 为 K、pres 为 Pa、rhum 为 %、shum 为
 | 地类 | 原文件与约定 |
 | --- | --- |
 | Copernicus | `LCLU/Copernicus_Landcover_100m.tif`，2019 年、EPSG:3857；配套 `Copernicus_CGLS_LC100_Mapping.csv` |
-| 精细分类 | 当前 `LCLU/vegetation_model_20261010_100411ImperviousIce.tif`；配套 `vegetation_model_20261010_100411.csv`；用户于 2026-10-12 再次确认代表 2023 年，文件时间不是制图年份 |
+| 精细分类 | 当前 `LCLU/vegetation_model_20261016_161145.tif`；配套 `vegetation_model_20261016_161145.csv`；共 48 类，用户于 2026-10-19 指定为当前版本；制图年份仍按此前确认的 2023 年处理，文件时间不是制图年份 |
 | ESA WorldCover v200 | `LCLU/ESA_WorldCover_v200.tif`，代表 2021 年；本地 EPSG:4326、约 0.000898315°，不是原生 10 m；配套 `ESA_WorldCover_10m_v200_Mapping.csv` |
 
 当前三套图均固定用于 2011—2024，不构成历史地类重建。精细指类别细分，不表示空间分辨率更高；当前版本已包含 24 类居住地（按用户确认作不透水）、25 类乔木绿地。图源年份差异也是比较局限。

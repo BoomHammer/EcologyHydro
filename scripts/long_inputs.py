@@ -9,7 +9,7 @@ from prepare_long_climate import monthly_data
 from scipy.ndimage import map_coordinates
 
 from ecologyhydro.baseline import read_json
-from ecologyhydro.rotation import weighted_kc
+from ecologyhydro.rotation import configured_rotation, weighted_kc
 from ecologyhydro.spatial import crs
 
 
@@ -40,17 +40,17 @@ def tables_for(root, index, product, years, positions, weights):
     tables = {year: deepcopy(original) for year in years}
     if product != "fine":
         return tables, []
+    crop_spec = yaml.safe_load((root / "config/crop_systems.yaml").read_text(encoding="utf-8"))
+    crop_code, system = configured_rotation(crop_spec)
     with gdal.Open(index["aligned"]["lulc_fine"]) as fine:
-        crop = fine.ReadAsArray().ravel()[positions] == 2
+        crop = fine.ReadAsArray().ravel()[positions] == crop_code
         yy, xx = np.divmod(positions[crop], fine.RasterXSize)
         gt = fine.GetGeoTransform()
         xs = gt[0] + (xx + 0.5) * gt[1] + (yy + 0.5) * gt[2]
         ys = gt[3] + (xx + 0.5) * gt[4] + (yy + 0.5) * gt[5]
         transform = osr.CoordinateTransformation(crs(fine.GetProjection()), crs("EPSG:4326"))
         lonlat = np.array(transform.TransformPoints(np.column_stack([xs, ys])))
-    coefficients = yaml.safe_load((root / "config/crop_systems.yaml").read_text(encoding="utf-8"))[
-        "systems"
-    ]["winter_wheat_summer_maize"]["monthly_kc"]
+    coefficients = system["monthly_kc"]
     records = []
     for year in years:
         path = (
@@ -71,7 +71,7 @@ def tables_for(root, index, product, years, positions, weights):
             monthly_sums.append(float(sampled @ weights[crop]))
         kc = weighted_kc(monthly_sums, coefficients)
         for entry in tables[year]:
-            if int(entry["lucode"]) == 2:
+            if int(entry["lucode"]) == crop_code:
                 entry["kc"] = kc
         records.append(
             {

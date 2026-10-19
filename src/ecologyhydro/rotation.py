@@ -29,7 +29,16 @@ def weighted_kc(monthly_depth_sums, monthly_coefficients):
     return float(weights @ coefficients / weights.sum())
 
 
-def monthly_statistics(index, sources, out):
+def configured_rotation(crop_spec, product="fine"):
+    """Return the single explicitly configured crop rotation code and system."""
+    mapping = crop_spec["mapping"][product]
+    if len(mapping) != 1:
+        raise ValueError(f"Exactly one {product} rotation mapping is required")
+    code, name = next(iter(mapping.items()))
+    return int(code), crop_spec["systems"][name]
+
+
+def monthly_statistics(index, sources, out, crop_code):
     import numpy as np
     from osgeo import gdal
 
@@ -70,7 +79,7 @@ def monthly_statistics(index, sources, out):
                     inside = ids > 0
                     if not inside.any():
                         continue
-                    crop = inside & (fine.ReadAsArray(*block) == 2)
+                    crop = inside & (fine.ReadAsArray(*block) == crop_code)
                     values = pet.ReadAsArray(*block).astype(np.float64) * 0.1
                     valid = pet.GetRasterBand(1).GetMaskBand().ReadAsArray(*block) > 0
                     if np.any(inside & (~valid | ~np.isfinite(values) | (values < 0))):
@@ -108,7 +117,7 @@ def prepare(config, index, index_path, crop_path, spec_path):
     from ecologyhydro.sensitivity import candidate_rows
 
     crop_spec = yaml.load(crop_path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
-    system = crop_spec["systems"][crop_spec["mapping"]["fine"]["2"]]
+    crop_code, system = configured_rotation(crop_spec)
     spec = yaml.load(spec_path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
     cache = ArtifactCache(config.paths.cache / "m4/rotation")
     jobs, diagnostics = [], []
@@ -126,8 +135,8 @@ def prepare(config, index, index_path, crop_path, spec_path):
         artifact = cache.build(
             "monthly_stats",
             [*monthly, *static, index_path, Path(__file__)],
-            {"year": year},
-            lambda out, files=monthly: monthly_statistics(index, files, out),
+            {"year": year, "crop_code": crop_code},
+            lambda out, files=monthly: monthly_statistics(index, files, out, crop_code),
         )
         details = json.loads((artifact / "manifest.json").read_text(encoding="utf-8"))["details"]
         kc = weighted_kc(details["crop_monthly_sums"], system["monthly_kc"])
@@ -155,7 +164,9 @@ def prepare(config, index, index_path, crop_path, spec_path):
             )
         prepared = prepare_inputs(index_path, config.paths.cache, year, "fine", "full")
         baseline_kc = next(
-            r["kc"] for r in candidate_rows(spec, "fine", "central") if r["lucode"] == 2
+            r["kc"]
+            for r in candidate_rows(spec, "fine", "central")
+            if r["lucode"] == crop_code
         )
         cases = {"baseline": baseline_kc, "rotation": kc}
         if year == 2019:
@@ -168,7 +179,7 @@ def prepare(config, index, index_path, crop_path, spec_path):
             def make_table(out, coefficient=value, case=variant):
                 records = candidate_rows(spec, "fine", "central")
                 for row in records:
-                    if row["lucode"] == 2 and case != "baseline":
+                    if row["lucode"] == crop_code and case != "baseline":
                         row.update(
                             kc=coefficient,
                             root_depth=system["annual_root_depth_mm"],
@@ -176,7 +187,7 @@ def prepare(config, index, index_path, crop_path, spec_path):
                             evidence="ET0-weighted assumed monthly rotation; fixed root proxy",
                         )
                 write_csv(out / "biophysical.csv", records)
-                return {"kc": coefficient, "only_lucode_2_changed": True}
+                return {"kc": coefficient, "changed_lucode": crop_code}
 
             table = cache.build(
                 "tables",

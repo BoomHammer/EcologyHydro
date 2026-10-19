@@ -55,21 +55,21 @@ def input_paths(config, product, year):
 
 
 def product_tables(config, product, positions, weights):
+    settings = config["products"][product]
     if registry_path := config.get("shared_biophysical_registry"):
         from ecologyhydro.shared_biophysical import load_registry, parameter_table
 
         registry = load_registry(resolve(config, registry_path))
-        rows = parameter_table(registry, product)
-        return {year: deepcopy(rows) for year in config["forcing_years"]}, []
-    settings = config["products"][product]
-    base = read_json(resolve(config, config["paths"]["base_tables"]))
-    original = deepcopy(base[settings["table_product"]][settings["table_year"]])
-    if "code_transfer" in settings:
-        lookup = {int(row["lucode"]): row for row in original}
-        original = [
-            {**deepcopy(lookup[source]), "lucode": code}
-            for code, source in settings["code_transfer"].items()
-        ]
+        original = parameter_table(registry, product)
+    else:
+        base = read_json(resolve(config, config["paths"]["base_tables"]))
+        original = deepcopy(base[settings["table_product"]][settings["table_year"]])
+        if "code_transfer" in settings:
+            lookup = {int(row["lucode"]): row for row in original}
+            original = [
+                {**deepcopy(lookup[source]), "lucode": code}
+                for code, source in settings["code_transfer"].items()
+            ]
     tables = {year: deepcopy(original) for year in config["forcing_years"]}
     rotation = settings["rotation_codes"]
     if not rotation:
@@ -271,6 +271,7 @@ def main():
     parser.add_argument("--config", required=True)
     args = parser.parse_args()
     config = load_protocol(args.config)
+    configure_threads(Resources.model_validate(config["resources"]))
     validate_prepared(config)
     target, adjustment, eligible, consumption, storage = accounts(config)
     output_root = resolve(config, config["paths"]["output_root"])

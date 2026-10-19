@@ -1,6 +1,6 @@
 # User-confirmed crop semantics. This is not yet an executable AWY parameter table.
-version: 2
-confirmed_on: '2026-10-09'
+version: 3
+confirmed_on: '2026-10-19'
 source: user_confirmation
 status: crop_system_confirmed_monthly_parameterization_hypothesis
 systems:
@@ -23,10 +23,11 @@ systems:
     irrigation_supply: unknown_not_zero
 mapping:
   fine:
-    '2': winter_wheat_summer_maize
+    '16': winter_wheat_summer_maize
 scope:
-  fine_code_2: Apply the rotation to all current irrigated-cropland pixels as a temporary simplification of the user-confirmed majority.
-  fine_code_3: 'User confirmed on 2026-10-11: rainfed cropland receives no irrigation; crop calendar remains unspecified, so do not infer the irrigated rotation.'
+  fine_code_16: Apply the rotation only to the class explicitly labelled Wheat-Maize double cropping.
+  fine_codes_2_15: Crop-specific classes retain their own root priors; no crop calendar is inferred.
+  fine_codes_17_19: Single maize and other rainfed classes do not receive the double-cropping calendar.
   copernicus_code_40: Mixed cropland; do not infer all pixels have the irrigated rotation or alter the map.
 future_subdivision:
   policy: Add new class-to-system mappings without overwriting historical legends or parameter versions.

@@ -4,6 +4,8 @@
 
 数据、方法及软件的参考文献、DOI 和使用状态见 [参考文献汇总](docs/REFERENCES.md)。
 
+从 2026-10-19 起，新的水文实验必须同时计算水和沙。新增 InVEST SDR 入口 `scripts/run_sediment.py`，配置 `config/sediment.yaml`；分类体系 C/P 转换、K 不重复乘 0.1317、年均 R 的适用范围及交付要求见 [水沙联合实验约定](docs/SEDIMENT_SDR.md)。SDR 坡面入河泥沙与测站输沙量分别报告。
+
 ## 当前任务
 
 已按最新指示实施“先分离选型并封存、再做两组公平比较”，细类参数库保持不变，执行记录见 [RIGOROUS_COMPARISON_PLAN.md](docs/RIGOROUS_COMPARISON_PLAN.md)。原三参数开发期达标版本保留，其三个历史对照保持冻结；新公平实验单独验收。当前状态与执行边界见 [DEVELOPMENT.md](DEVELOPMENT.md)。

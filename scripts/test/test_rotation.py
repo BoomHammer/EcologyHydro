@@ -2,7 +2,17 @@
 
 import pytest
 
-from ecologyhydro.rotation import weighted_kc
+from ecologyhydro.rotation import configured_rotation, weighted_kc
+
+
+def test_current_rotation_mapping_is_explicit():
+    spec = {
+        "mapping": {"fine": {"16": "wheat_maize"}},
+        "systems": {"wheat_maize": {"monthly_kc": [0.7] * 12}},
+    }
+    code, system = configured_rotation(spec)
+    assert code == 16
+    assert system["monthly_kc"] == [0.7] * 12
 
 
 def test_weighted_kc_conserves_annual_potential_et():

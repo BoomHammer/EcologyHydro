@@ -1,0 +1,82 @@
+# Annual hillslope sediment delivery under climatological R, not gauged sediment load.
+schema_version: 1
+comparison_config: config/landcover_comparison.yaml
+cache: project/sediment
+outputs: experiments/sediment
+erosivity: data/Soil/R-factor1991-2020.tif
+erodibility: data/Soil/epic-k-factor.tif
+support_practice: data/LCLU/P_300.tif
+crop_c: data/LCLU/nature_table_2_cropland_c_factor.csv
+noncrop_c: data/LCLU/nature_table_3_non_cropland_c_factor.csv
+observations: data/Hydrology/输沙量2011-2024.csv
+observation_unit: 100million_t/yr
+watersheds: project/repairs/closed_routing_v3/watersheds.gpkg
+zone_station: project/repairs/closed_routing_v3/zone_station.csv
+model:
+  flow_dir_algorithm: mfd
+  threshold_flow_accumulation: 1000
+  k_param: 2.0
+  ic_0_param: 0.5
+  sdr_max: 0.8
+  l_max: 122.0
+  n_workers: 2
+policy:
+  k_multiplier: 1.0
+  noncrop_range_position: 0.5
+  p_missing: no_practice_p1
+  k_gap_max_distance_m: 10000
+  # All values are declared priors; observations are never used for fitting.
+  r_period: 1991-2020
+  r_units: MJ_mm_ha-1_h-1_yr-1
+  k_units: t_ha_h_ha-1_MJ-1_mm-1
+# Codes apply ONLY to vegetation_model_20261016_161145.csv; validate label on load.
+# crop/noncrop numbers refer to the n column of the supplied source tables.
+fine_c:
+  1: {label: Flooded_Cropland, crop: 1}
+  2: {label: Celtuce, crop: 11}
+  3: {label: Chili, crop: 11}
+  4: {label: Cotton, crop: 8}
+  5: {label: Millet, crop: 3}
+  6: {label: Other_Irrigated_Cropland, crop: 17, assumption: unknown_crop_proxy}
+  7: {label: Peanut, crop: 7}
+  8: {label: Potato, crop: 5}
+  9: {label: Rapeseed, crop: 7}
+  10: {label: Sorghum, crop: 3}
+  11: {label: Soybean, crop: 4}
+  12: {label: Sunflower, crop: 7}
+  13: {label: Sweet_Potato, crop: 5}
+  14: {label: Tomato, crop: 11}
+  15: {label: Watermelon, crop: 15}
+  16: {label: Wheat-Maize_double_cropping, crop_mix: {3: 0.5, 2: 0.5}, assumption: equal_erosivity_share_without_seasonal_R}
+  17: {label: single-cropping_Maize, crop: 2}
+  18: {label: Other_Rainfed_Cropland, crop: 17, assumption: unknown_crop_proxy}
+  19: {label: single-cropping_Maize, crop: 2}
+  20: {label: Arbor_Garden_Land, crop: 16}
+  21: {label: Apple, crop: 15}
+  22: {label: Date, crop: 15}
+  23: {label: Grapes, crop: 14}
+  24: {label: Kiwi_Fruit, crop: 15}
+  25: {label: Other_Shrub_Garden_Land, crop: 16}
+  26: {label: Peach, crop: 15}
+  27: {label: Pear, crop: 15}
+  28: {label: Greenhouse, value: 0.0, assumption: intact_roof_no_sheet_rill_erosion}
+  29: {label: Barren_Soil, noncrop: 12}
+  30: {label: Bare_Sand, noncrop: 12, assumption: water_erosion_only_no_wind_erosion}
+  31: {label: Desert_Vegetation, noncrop: 10}
+  32: {label: Deciduous_Broadleaf_Forest, noncrop: 2}
+  33: {label: Mixed_Forest, noncrop: 5}
+  34: {label: Evergreen_Needleleaf_Forest, noncrop: 3}
+  35: {label: Open_Forest, noncrop: 6}
+  36: {label: Alpine_Meadow, noncrop: 8}
+  37: {label: Temperate_Shrubby_Grassland, noncrop: 9}
+  38: {label: Alpine_Steppe, noncrop: 8}
+  39: {label: Temperate_Steppe, noncrop: 8}
+  40: {label: Ice/Snow, value: 0.0, assumption: no_sheet_rill_erosion}
+  41: {label: Deciduous_Broadleaf_Shrubland, noncrop: 7}
+  42: {label: Evergreen_Needleleaf_Shurbland, noncrop: 7}
+  43: {label: Residential_Land, value: 0.0, assumption: impervious_proxy_construction_excluded}
+  44: {label: Urban_Green_Space, noncrop: 8, assumption: herbaceous_proxy}
+  45: {label: Lake, value: 0.0, assumption: water_no_sheet_rill_erosion}
+  46: {label: Reservoir/Pond, value: 0.0, assumption: water_no_sheet_rill_erosion_no_trapping_model}
+  47: {label: Herbaceous_Marsh, noncrop: 8, assumption: herbaceous_proxy_not_table3_wetland_measurement}
+  48: {label: River, value: 0.0, assumption: water_no_sheet_rill_erosion}

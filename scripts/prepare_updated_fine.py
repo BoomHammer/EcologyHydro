@@ -43,10 +43,10 @@ def main():
         legend = list(csv.reader(stream))[1:]
     if {int(row[0]) for row in legend} != {row["lucode"] for row in rows}:
         raise ValueError("New legend and parameter map differ")
-    built = next(row for row in rows if row["lucode"] == 24)
+    built = next(row for row in rows if row["lucode"] == fine["built_code"])
     water = next(row for row in rows if row["lucode"] == fine["water_code"])
     if built["profile"] != "built" or water["profile"] != "water":
-        raise ValueError("Shifted residential/water codes are not mapped correctly")
+        raise ValueError("Configured residential/water codes are not mapped correctly")
     aligned = resolve(config, fine["aligned"])
     aligned.parent.mkdir(parents=True, exist_ok=True)
     native = resolve(config, fine["native_aligned"])

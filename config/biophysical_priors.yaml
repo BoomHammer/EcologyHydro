@@ -5,7 +5,22 @@
 status: engineering_trial_only
 provenance: 'Project functional-group priors v1; see docs/M2_PREPROCESSING.md'
 groups:
-  crop: {lulc_veg: 1, root_depth: 1000, kc: 0.65}
+  crop: {lulc_veg: 1, root_depth: 1400, kc: 0.65}
+  rice: {lulc_veg: 1, root_depth: 750, kc: 0.65}
+  celtuce: {lulc_veg: 1, root_depth: 400, kc: 0.65}
+  chili: {lulc_veg: 1, root_depth: 750, kc: 0.65}
+  cotton: {lulc_veg: 1, root_depth: 1350, kc: 0.65}
+  millet: {lulc_veg: 1, root_depth: 1500, kc: 0.65}
+  peanut: {lulc_veg: 1, root_depth: 750, kc: 0.65}
+  potato: {lulc_veg: 1, root_depth: 500, kc: 0.65}
+  rapeseed: {lulc_veg: 1, root_depth: 1250, kc: 0.65}
+  sorghum: {lulc_veg: 1, root_depth: 1500, kc: 0.65}
+  soybean: {lulc_veg: 1, root_depth: 950, kc: 0.65}
+  sunflower: {lulc_veg: 1, root_depth: 1150, kc: 0.65}
+  sweet_potato: {lulc_veg: 1, root_depth: 1250, kc: 0.65}
+  tomato: {lulc_veg: 1, root_depth: 1100, kc: 0.65}
+  watermelon: {lulc_veg: 1, root_depth: 1150, kc: 0.65}
+  maize: {lulc_veg: 1, root_depth: 1350, kc: 0.65}
   tree: {lulc_veg: 1, root_depth: 2000, kc: 0.85}
   shrub: {lulc_veg: 1, root_depth: 1000, kc: 0.65}
   grass: {lulc_veg: 1, root_depth: 500, kc: 0.65}
@@ -40,32 +55,51 @@ mapping:
     '126': tree
     '200': water
   fine:
-    '1': crop
-    '2': crop
-    '3': crop
-    '4': tree
-    '5': shrub
+    '1': rice
+    '2': celtuce
+    '3': chili
+    '4': cotton
+    '5': millet
     '6': crop
-    '7': bare
-    '8': bare
-    '9': bare
-    '10': bare
-    '11': sparse
-    '12': bare
-    '13': tree
-    '14': tree
-    '15': tree
-    '16': tree
-    '17': tree
-    '18': grass
-    '19': grass
-    '20': grass
-    '21': grass
+    '7': peanut
+    '8': potato
+    '9': rapeseed
+    '10': sorghum
+    '11': soybean
+    '12': sunflower
+    '13': sweet_potato
+    '14': tomato
+    '15': watermelon
+    '16': crop
+    '17': maize
+    '18': crop
+    '19': maize
+    '20': tree
+    '21': shrub
     '22': shrub
     '23': shrub
-    '24': built
-    '25': tree
-    '26': water
-    '27': water
-    '28': wetland
-    '29': snow
+    '24': shrub
+    '25': shrub
+    '26': shrub
+    '27': shrub
+    '28': crop
+    '29': bare
+    '30': bare
+    '31': sparse
+    '32': tree
+    '33': tree
+    '34': tree
+    '35': tree
+    '36': grass
+    '37': grass
+    '38': grass
+    '39': grass
+    '40': snow
+    '41': shrub
+    '42': shrub
+    '43': built
+    '44': tree
+    '45': water
+    '46': water
+    '47': wetland
+    '48': water

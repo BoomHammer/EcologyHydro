@@ -20,11 +20,11 @@ from ecologyhydro.shared_biophysical import load_registry
 
 def fixture_data():
     rng = np.random.default_rng(103)
-    size = 11 * 3 * 29
+    size = 11 * 3 * 48
     raw = dict(
-        groups=np.repeat(np.arange(33), 29),
-        zone=np.repeat(np.tile(np.arange(11), 3), 29),
-        code=np.tile(np.arange(1, 30), 33),
+        groups=np.repeat(np.arange(33), 48),
+        zone=np.repeat(np.tile(np.arange(11), 3), 48),
+        code=np.tile(np.arange(1, 49), 33),
         weights=np.full(size, 0.002),
         p=rng.uniform(150, 900, size),
         et=rng.uniform(700, 1300, size),
@@ -56,7 +56,7 @@ def test_all_derivatives():
 
 def test_coarse_removes_subclass_location_but_preserves_area():
     data, registry = fixture_data()
-    legend = Path("data/LCLU/vegetation_model_20261010_100411.csv")
+    legend = Path("data/LCLU/vegetation_model_20261016_161145.csv")
     labels, components = hierarchy_components(data, registry, legend)
     coarse = collapse_hierarchy(data, labels, components)
     for parent in set(labels.values()):

@@ -54,19 +54,22 @@ def test_inheritance_validation():
         resolve_profile(spec, "open_tree")
 
 
-def test_updated_residential_legend_shift():
+def test_current_fine_legend_mapping():
     rows = {row["lucode"]: row for row in parameter_table(registry(), "fine")}
-    assert rows[24]["profile"] == "built"
-    assert rows[24]["lulc_veg"] == 0
-    assert rows[25]["profile"] == "tree"
-    assert rows[26]["profile"] == rows[27]["profile"] == "water"
-    assert rows[28]["profile"] == "wetland"
-    assert rows[29]["profile"] == "snow"
+    assert set(rows) == set(range(1, 49))
+    assert rows[16]["profile"] == "wheat_maize_rotation"
+    assert rows[16]["root_depth"] == 1400
+    assert rows[43]["profile"] == "built"
+    assert rows[43]["lulc_veg"] == 0
+    assert rows[44]["profile"] == "urban_green"
+    assert rows[45]["profile"] == rows[46]["profile"] == rows[48]["profile"] == "water"
+    assert rows[47]["profile"] == "wetland"
+    assert rows[40]["profile"] == "snow"
 
 
 def test_translation_preserves_forcing_and_rebuilds_awc():
     data = {
-        "code": np.array([9, 18]),
+        "code": np.array([29, 36]),
         "soil": np.array([500, 500]),
         "pawc": np.array([0.2, 0.2]),
         "p": np.array([400, 600]),

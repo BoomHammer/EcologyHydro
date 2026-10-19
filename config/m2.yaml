@@ -15,13 +15,13 @@ pet_directory: data/Climate/TerraClimate_PET
 precipitation_baseline: prec
 landcover:
   copernicus: data/LCLU/Copernicus_Landcover_100m.tif
-  fine: data/LCLU/vegetation_model_20261010_100411ImperviousIce.tif
+  fine: data/LCLU/vegetation_model_20261016_161145.tif
 class_tables:
   copernicus: data/LCLU/Copernicus_CGLS_LC100_Mapping.csv
-  fine: data/LCLU/vegetation_model_20261010_100411.csv
+  fine: data/LCLU/vegetation_model_20261016_161145.csv
 lake_overlay:
   vector: data/Hydrology/黄河流域湖泊.shp
-  water_codes: {fine: 26, copernicus: 80}
+  water_codes: {fine: 45, copernicus: 80}
 # Review triggers, not target areas or tolerances for forced boundary adjustment.
 reference_review:
   area_relative_difference: 0.15

@@ -48,6 +48,118 @@ profiles:
     root_source: ASSUMED
     kc_source: ASSUMED
     evidence: Structural placeholder; AWY cannot represent roof interception and irrigation.
+  celtuce:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [300, 400, 500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: Lettuce root-range proxy; annual Kc remains a generic crop hypothesis.
+  chili:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [500, 750, 1000]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: Sweet-pepper root-range proxy; annual Kc remains a generic crop hypothesis.
+  cotton:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1350, 1700]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO cotton effective-root range; annual Kc remains a generic crop hypothesis.
+  millet:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1500, 2000]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO millet effective-root range; annual Kc remains a generic crop hypothesis.
+  peanut:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [500, 750, 1000]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO groundnut effective-root range; annual Kc remains a generic crop hypothesis.
+  potato:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [400, 500, 600]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO potato effective-root range; annual Kc remains a generic crop hypothesis.
+  rapeseed:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1250, 1500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO rapeseed effective-root range; annual Kc remains a generic crop hypothesis.
+  sorghum:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1500, 2000]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO grain-sorghum effective-root range; annual Kc remains a generic crop hypothesis.
+  soybean:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [600, 950, 1300]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO soybean effective-root range; annual Kc remains a generic crop hypothesis.
+  sunflower:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [800, 1150, 1500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO sunflower effective-root range; annual Kc remains a generic crop hypothesis.
+  sweet_potato:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1250, 1500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO sweet-potato effective-root range; annual Kc remains a generic crop hypothesis.
+  tomato:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [700, 1100, 1500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO tomato effective-root range; annual Kc remains a generic crop hypothesis.
+  watermelon:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [800, 1150, 1500]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO watermelon effective-root range; annual Kc remains a generic crop hypothesis.
+  maize:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1350, 1700]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: FAO field-maize effective-root range; annual Kc remains a generic crop hypothesis.
+  wheat_maize_rotation:
+    veg: 1
+    kc: [0.45, 0.70, 0.95]
+    root_mm: [1000, 1400, 1800]
+    root_source: FAO_ROOT
+    kc_source: FAO_KC
+    evidence: Root proxy retained; annual Kc is supplied by the PET-weighted rotation scenario.
+  urban_green:
+    veg: 1
+    kc: [0.55, 0.775, 1.00]
+    root_mm: [500, 1050, 1600]
+    root_source: ASSUMED
+    kc_source: ASSUMED
+    evidence: Retains the preceding map's arboreal-green proxy; composition remains unresolved.
   deciduous_tree:
     veg: 1
     kc: [0.50, 0.75, 1.00]
@@ -149,34 +261,53 @@ profiles:
 mapping:
   fine:
     '1': rice
-    '2': cereal
-    '3': cereal
-    '4': orchard
-    '5': shrub_garden
-    '6': greenhouse
-    '7': bare
-    '8': bare
-    '9': bare
-    '10': bare
-    '11': sparse
-    '12': bare
-    '13': deciduous_tree
-    '14': mixed_tree
-    '15': conifer
-    '16': conifer
-    '17': open_tree
-    '18': alpine_meadow
-    '19': grass
-    '20': alpine_steppe
-    '21': grass
-    '22': shrub
-    '23': shrub
-    '24': built
-    '25': deciduous_tree
-    '26': water
-    '27': water
-    '28': wetland
-    '29': snow
+    '2': celtuce
+    '3': chili
+    '4': cotton
+    '5': millet
+    '6': cereal
+    '7': peanut
+    '8': potato
+    '9': rapeseed
+    '10': sorghum
+    '11': soybean
+    '12': sunflower
+    '13': sweet_potato
+    '14': tomato
+    '15': watermelon
+    '16': wheat_maize_rotation
+    '17': maize
+    '18': cereal
+    '19': maize
+    '20': orchard
+    '21': shrub_garden
+    '22': shrub_garden
+    '23': shrub_garden
+    '24': shrub_garden
+    '25': shrub_garden
+    '26': shrub_garden
+    '27': shrub_garden
+    '28': greenhouse
+    '29': bare
+    '30': bare
+    '31': sparse
+    '32': deciduous_tree
+    '33': mixed_tree
+    '34': conifer
+    '35': open_tree
+    '36': alpine_meadow
+    '37': grass
+    '38': alpine_steppe
+    '39': grass
+    '40': snow
+    '41': shrub
+    '42': shrub
+    '43': built
+    '44': urban_green
+    '45': water
+    '46': water
+    '47': wetland
+    '48': water
   copernicus:
     '20': shrub
     '30': grass

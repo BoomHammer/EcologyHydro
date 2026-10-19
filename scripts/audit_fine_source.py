@@ -63,9 +63,14 @@ def main():
     rows = [
         dict(source_code=a, used_code=b, area_km2=n * area) for (a, b), n in sorted(counts.items())
     ]
+    rotation_codes = set(config["products"]["fine"]["rotation_codes"])
     summary = dict(
-        source_code2_area_km2=sum(r["area_km2"] for r in rows if r["source_code"] == 2),
-        used_code2_area_km2=sum(r["area_km2"] for r in rows if r["used_code"] == 2),
+        source_rotation_area_km2=sum(
+            r["area_km2"] for r in rows if r["source_code"] in rotation_codes
+        ),
+        used_rotation_area_km2=sum(
+            r["area_km2"] for r in rows if r["used_code"] in rotation_codes
+        ),
         changed_area_km2=sum(r["area_km2"] for r in rows if r["source_code"] != r["used_code"]),
         comparison="Raw source independently nearest-warped to current calculation grid",
         source_fingerprints=[fingerprint(p) for p in (source_path, aligned_path, zone_path)],

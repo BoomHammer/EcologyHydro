@@ -12,10 +12,12 @@ if ($args.Count -eq 0) {
 $previousMambaRoot = $env:MAMBA_ROOT_PREFIX
 $previousUvCache = $env:UV_CACHE_DIR
 $previousPackageCache = $env:CONDA_PKGS_DIRS
+$previousMklThreadingLayer = $env:MKL_THREADING_LAYER
 try {
     $env:MAMBA_ROOT_PREFIX = Join-Path $projectRoot '.mamba'
     $env:UV_CACHE_DIR = Join-Path $projectRoot '.uv-cache'
     $env:CONDA_PKGS_DIRS = Join-Path $projectRoot '.mamba/pkgs'
+    $env:MKL_THREADING_LAYER = 'SEQUENTIAL'
     Push-Location $projectRoot
     try {
         & $mambaExe run --prefix $environmentPrefix @args
@@ -27,5 +29,6 @@ try {
     $env:MAMBA_ROOT_PREFIX = $previousMambaRoot
     $env:UV_CACHE_DIR = $previousUvCache
     $env:CONDA_PKGS_DIRS = $previousPackageCache
+    $env:MKL_THREADING_LAYER = $previousMklThreadingLayer
 }
 exit $commandExitCode

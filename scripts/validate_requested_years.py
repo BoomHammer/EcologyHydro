@@ -22,7 +22,7 @@ from ecologyhydro.cache import fingerprint
 from ecologyhydro.config import load_config, project_root
 from ecologyhydro.long_record import ENDPOINTS, REACH_MAP, STATIONS, YEARS, load_accounts, number
 from ecologyhydro.regional_transfer import evaluate
-from ecologyhydro.rotation import weighted_kc
+from ecologyhydro.rotation import configured_rotation, weighted_kc
 from ecologyhydro.runtime import configure_threads
 from ecologyhydro.simulation import write_json
 from ecologyhydro.spatial import crs, windows
@@ -80,8 +80,10 @@ def annual_table(root, index, product, year, positions, weights):
     table = deepcopy(tables[str(2018 if year == 2018 else 2019)])
     if year != 2023 or product != "fine":
         return table, None
+    crop_spec = yaml.safe_load((root / "config/crop_systems.yaml").read_text(encoding="utf-8"))
+    crop_code, system = configured_rotation(crop_spec)
     with gdal.Open(index["aligned"]["lulc_fine"]) as raster:
-        crop = raster.ReadAsArray().ravel()[positions] == 2
+        crop = raster.ReadAsArray().ravel()[positions] == crop_code
         yy, xx = np.divmod(positions[crop], raster.RasterXSize)
         gt = raster.GetGeoTransform()
         transform = osr.CoordinateTransformation(crs(raster.GetProjection()), crs("EPSG:4326"))
@@ -102,12 +104,10 @@ def annual_table(root, index, product, year, positions, weights):
         if not np.isfinite(sampled).all() or (sampled < 0).any():
             raise ValueError("Missing crop PET")
         sums.append(float(sampled @ weights[crop]))
-    calendar = yaml.safe_load((root / "config/crop_systems.yaml").read_text(encoding="utf-8"))[
-        "systems"
-    ]["winter_wheat_summer_maize"]["monthly_kc"]
+    calendar = system["monthly_kc"]
     kc = weighted_kc(sums, calendar)
     for row in table:
-        if int(row["lucode"]) == 2:
+        if int(row["lucode"]) == crop_code:
             row["kc"] = kc
     return table, {
         "year": 2023,

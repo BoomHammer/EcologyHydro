@@ -191,7 +191,37 @@ def prepare(config, recipe_path, stages):
     report_path = cache.root / "latest.json"
     if report_path.exists():
         previous = json.loads(report_path.read_text(encoding="utf-8"))
-        if previous["grid"] == grid and previous["recipe"] == recipe:
+        changed_recipe = {
+            key
+            for key in previous["recipe"].keys() | recipe.keys()
+            if previous["recipe"].get(key) != recipe.get(key)
+        }
+        stage_recipe_keys = {
+            "static": {
+                "dem",
+                "soil",
+                "soil_database",
+                "soil_crs_assumption",
+                "soil_depth_proxy_mm",
+                "soil_depth_status",
+                "soil_capacity_method",
+            },
+            "climate": {"climate_directory", "pet_directory", "precipitation_baseline"},
+            "landcover": {"landcover", "class_tables", "lake_overlay"},
+            "routing": {
+                "river_network",
+                "stations",
+                "boundary",
+                "station_review_distance_m",
+                "outlet_search_radius_m",
+                "outlet_method",
+                "tributary_min_upstream_km2",
+                "closed_lakes",
+            },
+            "quality": {"reference_review"},
+        }
+        selected_recipe_keys = set().union(*(stage_recipe_keys[stage] for stage in stages))
+        if previous["grid"] == grid and not changed_recipe - selected_recipe_keys:
             report["native"] = previous["native"] | paths
             report["aligned"] = previous["aligned"] | aligned
             if "biophysical" not in report and "biophysical" in previous:

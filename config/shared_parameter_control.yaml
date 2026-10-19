@@ -1,10 +1,10 @@
 baseline_config: config/landcover_comparison.yaml
 baseline_run: experiments/landcover_cross/20261010T182322_304737Z
 sample_sources:
-  fine: project/comparison_2011_2024_fine_20261010/samples
+  fine: project/comparison_2011_2024_fine_20261016/samples
   copernicus: experiments/landcover_cross/20261010T182322_304737Z
   worldcover: experiments/landcover_cross/20261010T182322_304737Z
-fine_sample_manifest: project/comparison_2011_2024_fine_20261010/samples/manifest.json
+fine_sample_manifest: project/comparison_2011_2024_fine_20261016/samples/manifest.json
 previous_shared_run: experiments/shared_parameters/20261011T082359_564643Z
 registry: config/shared_biophysical.yaml
 output_root: experiments/shared_parameters

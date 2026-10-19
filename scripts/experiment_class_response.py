@@ -24,7 +24,7 @@ from ecologyhydro.class_response import (
     prepare_response,
     thin_samples,
 )
-from ecologyhydro.comparison import accounts, metrics, training_mask
+from ecologyhydro.comparison import accounts, metrics, resolve, training_mask
 from ecologyhydro.long_record import STATIONS
 from ecologyhydro.paired_comparison import paired_scores
 from ecologyhydro.shared_biophysical import load_registry
@@ -162,11 +162,12 @@ def main():
         write_json(output / "experiment.json", recipe)
         shutil.copyfile(BASE / "execution_protocol.yaml", output / "execution_protocol.yaml")
         registry = load_registry(BASE / "shared_biophysical.yaml")
+        fine_legend = resolve(config, config["products"]["fine"]["classes"])
         for product in config["products"]:
             raw = load_samples(sample_directory(config, source, product), product)
             if product == "fine":
                 labels, components = hierarchy_components(
-                    raw, registry, Path("data/LCLU/vegetation_model_20261010_100411.csv")
+                    raw, registry, fine_legend
                 )
                 write_json(output / "hierarchy.json", dict(labels=labels, components=components))
             data = prepare_response(thin_samples(raw, args.budget), registry, product)
@@ -185,7 +186,7 @@ def main():
                     "src/ecologyhydro/class_response.py",
                     "src/ecologyhydro/paired_comparison.py",
                     BASE / "shared_biophysical.yaml",
-                    "data/LCLU/vegetation_model_20261010_100411.csv",
+                    fine_legend,
                 )
             ],
         )

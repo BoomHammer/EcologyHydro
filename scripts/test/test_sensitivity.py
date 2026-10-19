@@ -26,10 +26,13 @@ def test_shared_parameter_policy_and_distinct_alpine_roots():
     )
     fine = {r["lucode"]: r for r in candidate_rows(spec, "fine", "central")}
     coarse = {r["lucode"]: r for r in candidate_rows(spec, "copernicus", "central")}
-    for key in ("kc", "root_depth", "lulc_veg"):
-        assert fine[2][key] == fine[3][key] == coarse[40][key]
-    assert fine[18]["root_depth"] == 300
-    assert fine[20]["root_depth"] > 300
+    assert fine[2]["root_depth"] == 400
+    assert fine[8]["root_depth"] == 500
+    assert fine[16]["root_depth"] == 1400
+    assert fine[17]["root_depth"] == 1350
+    assert fine[36]["root_depth"] == 300
+    assert fine[38]["root_depth"] > 300
+    assert fine[6]["kc"] == fine[18]["kc"] == coarse[40]["kc"]
     for variant in ("kc_low", "kc_high", "root_low", "root_high"):
         for row in candidate_rows(spec, "fine", variant):
             unchanged = "root_depth" if variant.startswith("kc") else "kc"

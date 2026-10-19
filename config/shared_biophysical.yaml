@@ -2,7 +2,7 @@
 # Screening priors, NOT a locally validated parameter set. See the evidence report.
 schema_version: 1
 status: evidence_audited_screening_priors
-reviewed_on: '2026-10-11'
+reviewed_on: '2026-10-19'
 sources:
   INVEST: https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/annual_water_yield.html
   FAO_KC: https://www.fao.org/4/X0490E/x0490e0b.htm
@@ -161,37 +161,134 @@ profiles:
   greenhouse:
     parent: crop
     limitation: Crop fallback only; roofs/irrigation are structural uncertainty requiring area audit.
+  celtuce:
+    parent: crop
+    root_depth: 400
+    root_evidence: FAO lettuce effective-root range midpoint; celtuce-specific depth unavailable.
+    root_sources: [FAO_ROOT]
+    limitation: Lettuce proxy; annual Kc remains the generic crop hypothesis without a local calendar.
+  chili:
+    parent: crop
+    root_depth: 750
+    root_evidence: FAO sweet-pepper effective-root range midpoint.
+    root_sources: [FAO_ROOT]
+    limitation: Pepper proxy; annual Kc remains the generic crop hypothesis without a local calendar.
+  cotton:
+    parent: crop
+    root_depth: 1350
+    root_evidence: Midpoint of the FAO cotton effective-root range 1.0-1.7 m.
+    root_sources: [FAO_ROOT]
+  millet:
+    parent: crop
+    root_depth: 1500
+    root_evidence: Midpoint of the FAO millet effective-root range 1.0-2.0 m.
+    root_sources: [FAO_ROOT]
+  peanut:
+    parent: crop
+    root_depth: 750
+    root_evidence: Midpoint of the FAO groundnut effective-root range 0.5-1.0 m.
+    root_sources: [FAO_ROOT]
+  potato:
+    parent: crop
+    root_depth: 500
+    root_evidence: Midpoint of the FAO potato effective-root range 0.4-0.6 m.
+    root_sources: [FAO_ROOT]
+  rapeseed:
+    parent: crop
+    root_depth: 1250
+    root_evidence: Midpoint of the FAO rapeseed effective-root range 1.0-1.5 m.
+    root_sources: [FAO_ROOT]
+  sorghum:
+    parent: crop
+    root_depth: 1500
+    root_evidence: Midpoint of the FAO grain-sorghum effective-root range 1.0-2.0 m.
+    root_sources: [FAO_ROOT]
+  soybean:
+    parent: crop
+    root_depth: 950
+    root_evidence: Midpoint of the FAO soybean effective-root range 0.6-1.3 m.
+    root_sources: [FAO_ROOT]
+  sunflower:
+    parent: crop
+    root_depth: 1150
+    root_evidence: Midpoint of the FAO sunflower effective-root range 0.8-1.5 m.
+    root_sources: [FAO_ROOT]
+  sweet_potato:
+    parent: crop
+    root_depth: 1250
+    root_evidence: Midpoint of the FAO sweet-potato effective-root range 1.0-1.5 m.
+    root_sources: [FAO_ROOT]
+  tomato:
+    parent: crop
+    root_depth: 1100
+    root_evidence: Midpoint of the FAO tomato effective-root range 0.7-1.5 m.
+    root_sources: [FAO_ROOT]
+  watermelon:
+    parent: crop
+    root_depth: 1150
+    root_evidence: Midpoint of the FAO watermelon effective-root range 0.8-1.5 m.
+    root_sources: [FAO_ROOT]
+  maize:
+    parent: crop
+    root_depth: 1350
+    root_evidence: Midpoint of the FAO field-maize effective-root range 1.0-1.7 m.
+    root_sources: [FAO_ROOT]
+  wheat_maize_rotation:
+    parent: crop
+    limitation: Annual Kc is replaced by the documented PET-weighted monthly rotation scenario.
+  urban_green:
+    parent: tree
+    limitation: Generic urban green space; retains the preceding map's arboreal-green proxy.
 mapping:
   fine:
     '1': rice
-    '2': crop
-    '3': crop
-    '4': orchard
-    '5': shrub_garden
-    '6': greenhouse
-    '7': bare
-    '8': bare
-    '9': bare
-    '10': bare
-    '11': desert_vegetation
-    '12': bare
-    '13': deciduous_tree
-    '14': tree
-    '15': deciduous_conifer
-    '16': evergreen_conifer
-    '17': open_tree
-    '18': alpine_meadow
-    '19': grass
-    '20': alpine_steppe
-    '21': temperate_steppe
-    '22': shrub
-    '23': shrub
-    '24': built
-    '25': tree
-    '26': water
-    '27': water
-    '28': wetland
-    '29': snow
+    '2': celtuce
+    '3': chili
+    '4': cotton
+    '5': millet
+    '6': crop
+    '7': peanut
+    '8': potato
+    '9': rapeseed
+    '10': sorghum
+    '11': soybean
+    '12': sunflower
+    '13': sweet_potato
+    '14': tomato
+    '15': watermelon
+    '16': wheat_maize_rotation
+    '17': maize
+    '18': crop
+    '19': maize
+    '20': orchard
+    '21': shrub_garden
+    '22': shrub_garden
+    '23': shrub_garden
+    '24': shrub_garden
+    '25': shrub_garden
+    '26': shrub_garden
+    '27': shrub_garden
+    '28': greenhouse
+    '29': bare
+    '30': bare
+    '31': desert_vegetation
+    '32': deciduous_tree
+    '33': tree
+    '34': evergreen_conifer
+    '35': open_tree
+    '36': alpine_meadow
+    '37': grass
+    '38': alpine_steppe
+    '39': temperate_steppe
+    '40': snow
+    '41': shrub
+    '42': shrub
+    '43': built
+    '44': urban_green
+    '45': water
+    '46': water
+    '47': wetland
+    '48': water
   copernicus:
     '20': shrub
     '30': grass
@@ -230,8 +327,9 @@ unmapped:
   worldcover: [95]
 mapping_limitations:
   coarse_60: Less than or equal to 10 percent vegetation per product manuals; bare-dominant approximation, not measured zero vegetation. Do not assign homogeneous desert vegetation roots.
-  fine_11: Desert vegetation cover fraction is unspecified; cannot equate automatically to coarse 60.
-  fine_24: Updated 20261010 legend; residential land is impervious per user confirmation, uses shared built profile.
-  fine_25: Updated urban tree green space; not impervious. Lake/reservoir/wetland shifted to 26/27/28.
+  fine_31: Desert vegetation cover fraction is unspecified; cannot equate automatically to coarse 60.
+  fine_43: Residential land is impervious and uses the shared built profile.
+  fine_44: Generic urban green space retains the prior arboreal-green proxy; composition is unresolved.
+  fine_45_48: Lake, reservoir/pond and river use water; herbaceous marsh uses wetland.
   crop: Rotation information is real but its assumed annual Kc is not independently verified; isolate in a later seasonal control.
   forest: Copernicus also has forest subtypes; supported detail is available to every product whose legend resolves it.

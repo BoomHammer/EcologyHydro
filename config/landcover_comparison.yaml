@@ -10,7 +10,7 @@ model: reach7
 shared_biophysical_registry: config/shared_biophysical.yaml
 paths:
   output_root: experiments/landcover_cross
-  prepared: project/comparison_2011_2024_fine_20261010
+  prepared: project/comparison_2011_2024_fine_20261016
   grid_index: project/repairs/soil_routing/m2_index.json
   zones: project/repairs/closed_routing_v3/zones.tif
   pawc: project/cache/m2/aligned/pawc/0dc28d6f52acc3953d75ba39/data.tif
@@ -41,14 +41,15 @@ climate:
       raw_template: project/repairs/climate_reference_full_holdout/provider/terraclimate_current_{variable}_{year}.nc
 products:
   fine:
-    source: data/LCLU/vegetation_model_20261010_100411ImperviousIce.tif
-    classes: data/LCLU/vegetation_model_20261010_100411.csv
-    aligned: project/comparison_2011_2024_fine_20261010/fine/data.tif
-    native_aligned: project/comparison_2011_2024_fine_20261010/fine/native_aligned.tif
-    water_code: 26
+    source: data/LCLU/vegetation_model_20261016_161145.tif
+    classes: data/LCLU/vegetation_model_20261016_161145.csv
+    aligned: project/comparison_2011_2024_fine_20261016/fine/data.tif
+    native_aligned: project/comparison_2011_2024_fine_20261016/fine/native_aligned.tif
+    built_code: 43
+    water_code: 45
     table_product: fine
     table_year: '2019'
-    rotation_codes: [2]
+    rotation_codes: [16]
   copernicus:
     source: data/LCLU/Copernicus_Landcover_100m.tif
     classes: data/LCLU/Copernicus_CGLS_LC100_Mapping.csv
