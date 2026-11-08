@@ -10,8 +10,9 @@ crop_c: data/LCLU/nature_table_2_cropland_c_factor.csv
 noncrop_c: data/LCLU/nature_table_3_non_cropland_c_factor.csv
 observations: data/Hydrology/输沙量2011-2024.csv
 observation_unit: 100million_t/yr
-watersheds: project/repairs/closed_routing_v3/watersheds.gpkg
-zone_station: project/repairs/closed_routing_v3/zone_station.csv
+watersheds: project/sediment/stations_complete_20261020/watersheds.gpkg
+zones: project/sediment/stations_complete_20261020/zones.tif
+zone_station: project/sediment/stations_complete_20261020/zone_station.csv
 model:
   flow_dir_algorithm: mfd
   threshold_flow_accumulation: 1000
@@ -29,7 +30,7 @@ policy:
   r_period: 1991-2020
   r_units: MJ_mm_ha-1_h-1_yr-1
   k_units: t_ha_h_ha-1_MJ-1_mm-1
-# Codes apply ONLY to vegetation_model_20261016_161145.csv; validate label on load.
+# Codes checked against vegetation_model_20261022_150606.csv; validate label on load.
 # crop/noncrop numbers refer to the n column of the supplied source tables.
 fine_c:
   1: {label: Flooded_Cropland, crop: 1}

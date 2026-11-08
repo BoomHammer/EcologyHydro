@@ -13,6 +13,7 @@ from ecologyhydro.class_response import (
     hierarchy_components,
     prepare_response,
 )
+from ecologyhydro.comparison import load_protocol, resolve
 from ecologyhydro.paired_comparison import paired_scores
 from ecologyhydro.regional_transfer import evaluate as baseline_evaluate
 from ecologyhydro.shared_biophysical import load_registry
@@ -56,7 +57,8 @@ def test_all_derivatives():
 
 def test_coarse_removes_subclass_location_but_preserves_area():
     data, registry = fixture_data()
-    legend = Path("data/LCLU/vegetation_model_20261016_161145.csv")
+    protocol = load_protocol("config/landcover_comparison.yaml")
+    legend = resolve(protocol, protocol["products"]["fine"]["classes"])
     labels, components = hierarchy_components(data, registry, legend)
     coarse = collapse_hierarchy(data, labels, components)
     for parent in set(labels.values()):

@@ -124,7 +124,7 @@ def prepare_inputs(root, settings):
     grid = index["grid"]
     fine = protocol["products"]["fine"]
     lulc = root / fine["aligned"]
-    zones = root / protocol["paths"]["zones"]
+    zones = root / settings.get("zones", protocol["paths"]["zones"])
     # Unburned terrain: artificial river incision must not inflate RUSLE slopes.
     dem = Path(index["aligned"]["dem"])
     cache = ArtifactCache(root / settings["cache"])
@@ -312,7 +312,7 @@ def sediment_coverage(workspace, root, settings):
     stream_counts = counts.copy()
     totals = np.zeros(256, dtype=np.float64)
     with (
-        gdal.Open(str(root / protocol["paths"]["zones"])) as zones,
+        gdal.Open(str(root / settings.get("zones", protocol["paths"]["zones"]))) as zones,
         gdal.Warp(
             "",
             str(workspace / "sed_export.tif"),

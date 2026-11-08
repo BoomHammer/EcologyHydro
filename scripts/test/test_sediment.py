@@ -95,12 +95,20 @@ def test_reference_zero_is_valid_and_unknown_unit_is_not_guessed(tmp_path):
     assert observation_rows(source, "100million_t/yr", {})[2]["observed_t_yr"] == 1e7
 
 
-def test_sdr_320_hectare_units_and_stream_exclusions(tmp_path):
+@pytest.mark.parametrize("override_zones", [False, True])
+def test_sdr_320_hectare_units_and_stream_exclusions(tmp_path, override_zones):
     gdal.UseExceptions()
     grid = {"crs": ALBERS, "bounds": [0, 0, 500, 500], "width": 2, "height": 2, "resolution": 250}
     (tmp_path / "grid.json").write_text(json.dumps({"grid": grid}), encoding="utf-8")
     (tmp_path / "protocol.yaml").write_text(
-        yaml.safe_dump({"paths": {"grid_index": "grid.json", "zones": "zones.tif"}}),
+        yaml.safe_dump(
+            {
+                "paths": {
+                    "grid_index": "grid.json",
+                    "zones": "unused_old_zones.tif" if override_zones else "zones.tif",
+                }
+            }
+        ),
         encoding="utf-8",
     )
     (tmp_path / "members.csv").write_text("station_id,zone_id\n1,1\n", encoding="utf-8")
@@ -121,6 +129,7 @@ def test_sdr_320_hectare_units_and_stream_exclusions(tmp_path):
         {
             "comparison_config": "protocol.yaml",
             "zone_station": "members.csv",
+            **({"zones": "zones.tif"} if override_zones else {}),
         },
     )[1]
     assert row["independent_raster_sum_t_yr"] == 12.5

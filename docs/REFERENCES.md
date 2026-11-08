@@ -22,7 +22,7 @@
 | ALOS DSM | `data/DEM/ALOS_DSM_100m.tif` | 主链：由 30 m 重采样的高程数据；原产品具体版本待补 | D08 |
 | HydroRIVERS v1.0 Asia 黄河裁剪 | `data/Hydrology/HydroRIVERS_v10_as_shp/` | 主链：干支流拓扑、测站匹配及水文约束 | D09 |
 | HydroBASINS Asia level 06 v1c 标准版 | `project/references/hydrobasins_as06/` | 诊断及主链修复：内流面识别、闭流路由修正 | D09 |
-| 自制精细分类及大类合并图 | `data/LCLU/vegetation_model_20261016_161145.tif` 及同源 CSV | 主链：用户确认代表 2023 年；大类图是同源派生结果 | U01 |
+| 自制精细分类及大类合并图 | `data/LCLU/vegetation_model_20261018_003602.tif` 及同源 CSV | 主链：用户确认代表 2023 年；大类图是同源派生结果 | U01 |
 | 黄河流域范围、湖泊矢量 | `data/Hydrology/黄河流域.shp`、`黄河流域湖泊.shp` | 主链：研究范围参考、共用水体掩膜；原始发布来源未确定 | U02 |
 | 实测径流、耗水、库容变化、统计降水、面积 | `data/Hydrology/*2011-2024.csv`、`测站控制面积.csv`、`水资源二级区面积.csv` | 主链及核查，逐项用途见 U03；不把所有水量相加或重复扣减 | U03 |
 | 2022、2023、2024 年黄河水资源公报 | `data/Hydrology/2022年黄河水资源公报.pdf` 等 | 已用于水量账户、单位与本地耗水／外调水拆分核查 | U04 |
@@ -374,7 +374,7 @@ O'Neill, B. C., Tebaldi, C., van Vuuren, D. P., et al. (2016). **The Scenario Mo
 
 ### U01 — 自制精细地表分类及其大类
 
-- 资料：`vegetation_model_20261016_161145.tif`、`vegetation_model_20261016_161145.csv`，用户于 2026-10-19 指定为当前 48 类版本；沿用此前确认的 2023 年代表年份，文件名时间不是制图年份。
+- 资料：`vegetation_model_20261018_003602.tif`、`vegetation_model_20261018_003602.csv`，用户于 2026-10-19 指定为当前 48 类版本；沿用此前确认的 2023 年代表年份，文件名时间不是制图年份。
 - 作物细类有效根深采用 M05（FAO-56 表 22）范围中值；莴笋暂用生菜、辣椒暂用甜椒代理。没有本地物候的细类继承统一年度 Kc，不能把 FAO 生育期 Kc 直接解释为本地全年 Kc。
 - DOI：**未提供／未发现公开发布记录**。
 - 待补：作者或制作机构、正式题名、制作方法、数据发布日期、版本、验证资料以及公开论文／仓储 DOI（若有）。大类图引用同一原始精细数据，并单独说明项目聚合规则，不伪造另一个数据来源。
@@ -458,5 +458,8 @@ Natural Capital Alliance. **Global Soil Erodibility — EPIC K-Factor**. NatCap 
 ## 9. SDR 泥沙计算新增文献（2026-10-19）
 
 - Natural Capital Project. [InVEST SDR 官方文档](https://storage.googleapis.com/releases.naturalcapitalproject.org/invest-userguide/latest/en/sdr.html)，本地软件 3.20.2。
+- Yin, S., Xie, Y., Liu, B., & Nearing, M. A. (2015). Rainfall erosivity estimation based on rainfall data collected over a range of temporal resolutions. *HESS*, 19, 4113–4126. [doi:10.5194/hess-19-4113-2015](https://doi.org/10.5194/hess-19-4113-2015)。说明粗时间分辨率估算的局限，不能将其对其他方法的推荐转为对月总降水方法的推荐。
+- Abd Elbasit et al. (2013). Spatiotemporal Changes of Rainfall Erosivity in Loess Plateau, China. [doi:10.1155/2013/256352](https://doi.org/10.1155/2013/256352)。MFI 的区域应用背景；`R_y=R_baseline×MFI_y/mean(MFI)` 是本项目未经年际精度验证的近似假设，不是文献直接提供的标定关系。
+- GDAL. [VRT 格式及内置乘积函数](https://gdal.org/en/stable/drivers/raster/vrt.html)。年度 R 与坡面入河量采用虚拟栅格节省存储；本地 3.10 使用 NaN 传播，未使用 3.12 才新增的 `propagateNoData` 参数。
 - Li, J., He, H., Zeng, Q., Chen, L., & Sun, R. (2023). A Chinese soil conservation dataset preventing soil water erosion from 1992 to 2019. *Scientific Data*, 10, 319. [doi:10.1038/s41597-023-02246-4](https://doi.org/10.1038/s41597-023-02246-4)，C 表 2/3 的来源；[配套数据](https://doi.org/10.57760/sciencedb.07135)。用户提供的 R/K 原始产品出处待补，不能归为该文产品。使用范围、P 文件溯源限制与转换假设见 [SEDIMENT_SDR.md](SEDIMENT_SDR.md)。
 

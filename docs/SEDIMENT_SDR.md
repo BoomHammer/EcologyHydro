@@ -61,6 +61,12 @@ powershell -ExecutionPolicy Bypass -File scripts/run.ps1 python scripts/run_sedi
 
 ## 首次执行结果与验证
 
+2026-10-20 已修正漏站：原始泥沙 CSV 中的潼关、小浪底、艾山坐标一直可用，现已补齐流域，更新泥沙配置与分区选择，生成 [14 站结果及全部 10 个实测站对照](../experiments/sediment_annual/20261019T172848_451697Z/report.md)。没有因补站改变原 11 站的汇总结果；具体划界检查与复现命令见 [STATION_SEDIMENT.md](STATION_SEDIMENT.md)。下方保留首次运行记录，不代表当前缺站。
+
+后续已完成 [CMFD 月降水近似 R 驱动的 2011—2024 年结果](../experiments/sediment_annual/20261019T150508_413963Z/report.md)，入口 `scripts/run_annual_sediment.py`。年度栅格采用 VRT 节省磁盘，11 站共 154 条模型结果，7 站与实测匹配。该近似使用固定当前地类，不重建历史治理和库河冲淤，仍不是完整测站输沙预测；方法、复现和检验边界见 [STATION_SEDIMENT.md](STATION_SEDIMENT.md)。下方为原年均基准记录。
+
+测站输沙量的扩展路线和资料缺口见 [STATION_SEDIMENT.md](STATION_SEDIMENT.md)；已另生成 [实测参考对照及年际变化图](../experiments/sediment/20261019T062929_361071Z/reference_comparison/report.md)。该对照未使用实测率定，不能作为测站输沙预测精度检验。
+
 已完成 [20261019T062929_361071Z 结果报告](../experiments/sediment/20261019T062929_361071Z/report.md)，[11 站结果 CSV](../experiments/sediment/20261019T062929_361071Z/station_sediment.csv) 和 [实测参考表](../experiments/sediment/20261019T062929_361071Z/observations_reference.csv)。利津控制区坡面入河泥沙为 **1.75896775 亿吨/年**，坡面土壤流失为 **10.826473 亿吨/年**；这些是未率定、当前精细图和多年平均 R 条件下的初始估计。
 
 全域 `sed_export` 有 426,864 个空值，其中 404,469 个是官方模型按设计不计算坡面侵蚀的河流像元；剩余 22,395 个非河流像元没有有效输移结果，约 1,399.69 km²。非河流区覆盖率为 99.8087%；未连通部分不补零，统计结果是有效模型域的汇总。其他站的覆盖率与缺失数量均在 CSV 中。MFD 河网、河道阈值和地形尺度仍需后续独立检验。

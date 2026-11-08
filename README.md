@@ -1,10 +1,16 @@
 # 黄河流域年度径流模拟
 
+2026-10-25：已完成新版 `vegetation_model_20261022_150606.tif` 的水文和泥沙全流程重算。
+查看[综合图表与数据](experiments/updated_fine_20261022/report.html)和[执行记录](docs/UPDATED_FINE_20261022.md)。
+独立率定精细图三年整体相对 RMSE 为 12.101%，尚未在多数站年胜出；泥沙为坡面入河量，未包含库河冲淤。
+
 本项目基于 InVEST Annual Water Yield，比较精细分类、精细分类的大类、Copernicus 和 ESA WorldCover 对黄河流域测站年径流的模拟，并为后续 CMIP6 和地类变化实验提供基础模型。
 
 数据、方法及软件的参考文献、DOI 和使用状态见 [参考文献汇总](docs/REFERENCES.md)。
 
 从 2026-10-19 起，新的水文实验必须同时计算水和沙。新增 InVEST SDR 入口 `scripts/run_sediment.py`，配置 `config/sediment.yaml`；分类体系 C/P 转换、K 不重复乘 0.1317、年均 R 的适用范围及交付要求见 [水沙联合实验约定](docs/SEDIMENT_SDR.md)。SDR 坡面入河泥沙与测站输沙量分别报告。
+
+已使用现有 CMFD 月降水完成 [2011—2024 年泥沙初步结果及实测对照](experiments/sediment_annual/20261019T172848_451697Z/report.md)：14 个控制流域、全部 10 个实测站匹配；2026-10-20 已按原 CSV 经纬度补齐此前漏接的潼关、小浪底、艾山，未下载日数据。月尺度近似 R、固定基准地类，结果仍为坡面入河量，未模拟库河冲淤或使用实测率定。年度入口为 `scripts/run_annual_sediment.py`，复现说明见 [测站泥沙文档](docs/STATION_SEDIMENT.md)。
 
 ## 当前任务
 
